@@ -1,0 +1,11 @@
+# Official Superset image plus the PostgreSQL driver (the 6.1.0 image does not include psycopg2).
+FROM apache/superset:6.1.0
+
+USER root
+RUN . /app/.venv/bin/activate && \
+    if command -v uv >/dev/null 2>&1; then \
+        uv pip install --no-cache-dir psycopg2-binary==2.9.11; \
+    else \
+        python -m pip install --no-cache-dir psycopg2-binary==2.9.11; \
+    fi
+USER superset

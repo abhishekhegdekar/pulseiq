@@ -43,5 +43,25 @@ services:
       - ./data:/app/data:ro
       - ./sql:/app/sql:ro
 
+  superset:
+    build:
+      context: .
+      dockerfile: Dockerfile.superset
+    image: pulseiq-superset:6.1.0
+    env_file: .env
+    environment:
+      SUPERSET_CONFIG_PATH: /app/superset_config.py
+      SERVER_WORKER_AMOUNT: "1"
+    ports:
+      - "127.0.0.1:8088:8088"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./superset/superset_config.py:/app/superset_config.py:ro
+      - ./dashboards:/app/dashboards
+    mem_limit: 1536m
+    restart: unless-stopped
+
 volumes:
   pgdata:
