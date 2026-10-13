@@ -5,7 +5,7 @@ Workforce analytics pipeline, warehouse and dashboards for the fictional company
 
 ## Status
 - [x] Task 1: ETL pipeline (extract, transform, validate, publish, run log, tests, metric dictionary)
-- [ ] Task 2: Analytics warehouse
+- [x] Task 2: Analytics warehouse
 - [ ] Task 3: Headcount & Departments dashboard
 - [ ] Task 4: Attendance analysis
 
@@ -85,8 +85,28 @@ dashboards/    exported dashboards (Task 3)
 
 ## Known limitations and open items
 - Only the workbook was supplied; no separate Python-team export files exist.
-- `fact_attendance_monthly` is monthly. The Task 2 brief describes attendance per day; this will be resolved in Task 2.
-- 82 payroll rows in the raw sheet carry a `period_end_date` outside the validity window of the employee version their `employee_key` points to. Not treated as an error in Task 1; to be investigated in Task 2.
+- `fact_attendance_monthly` is monthly. The Task 2 brief describes attendance per day. Decision: the warehouse keeps the monthly grain (one row per employee version per month), as in the source.
+- 82 payroll rows (85 attendance rows) fall after the valid_to of their employee version. Resolved in Task 2: they are the final months of leavers, and the as-of rule links them to the right version (check Q4 in sql/q4_facts_link_to_effective_version.sql).
 - Reject files contain full row data (including pay). Keep them local.
 - Dependencies are pinned in `requirements.txt` (pandas 3.0.6, pandera 0.34.1, pyarrow 26.0.0, openpyxl 3.1.5) on Python 3.13.
 - Warehouse schema diagram: docs/schema_diagram.png (SQL in sql/01_schema.sql)
+
+## How to run (Docker only; needs `.env`, copy from `.env.example`)
+
+```
+docker compose run --rm --build tests                              # 48 tests
+docker compose run --rm --build -e ALLOW_REJECTS=true etl          # clean data -> data/clean (a strict run exits 1 if rows are rejected)
+docker compose run --rm --build load                               # schema + upserts into PostgreSQL, builds the headcount fact
+docker compose run --rm load python -m pulseiq.check_headcount     # vs workbook: 891 department-months match
+docker compose run --rm load python -m pulseiq.check_answers       # 3 SQL answers + integrity check vs clean files
+```
+
+Loading twice changes nothing (0 inserted, 0 updated).
+
+## Warehouse
+
+- Schema: `sql/01_schema.sql`; diagram: `docs/schema_diagram.png`
+- Design and grains: `docs/warehouse_design.md`
+- Keys, SCD2 and the department-transfer rule: `docs/scd2_keys_and_transfers.md`
+- Headcount rules and validation: `docs/headcount_validation.md`
+- Answers: `sql/q1..q4_*.sql`
