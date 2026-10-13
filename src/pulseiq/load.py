@@ -159,7 +159,8 @@ def build_headcount(cur, reporting_date: date) -> dict:
             "unchanged": built - len(flags), "not_in_source": 0, "deleted": deleted}
 
 
-def load_all(clean_dir: Path, schema_file: Path, settings: dict, reporting_date: date) -> dict:
+def load_all(clean_dir: Path, schema_file: Path, settings: dict, reporting_date: date,
+             views_file: Path | None = None) -> dict:
     frames = {}
     for name, _, _ in LOAD_ORDER:
         path = clean_dir / f"{name}.parquet"
@@ -171,6 +172,8 @@ def load_all(clean_dir: Path, schema_file: Path, settings: dict, reporting_date:
     with psycopg.connect(**settings) as conn:      # commits on success, rolls back on error
         with conn.cursor() as cur:
             cur.execute(schema_file.read_text(encoding="utf-8"))   # idempotent
+            if views_file is not None:                             # dashboard views, also idempotent
+                cur.execute(views_file.read_text(encoding="utf-8"))
             for name, table, key in LOAD_ORDER:
                 results[table] = upsert_table(cur, table, key, frames[name])
                 log.info("Loaded %-22s %s", table, results[table])
@@ -186,14 +189,16 @@ def main() -> int:
         settings = _db_settings()
         data_dir = Path(os.environ.get("DATA_DIR", "data"))
         schema_file = Path(os.environ.get("SCHEMA_FILE", "sql/01_schema.sql"))
-        if not schema_file.exists():
-            raise ConfigError(f"Schema file not found: {schema_file}")
+        views_file = Path(os.environ.get("VIEWS_FILE", "sql/02_reporting_views.sql"))
+        for needed in (schema_file, views_file):
+            if not needed.exists():
+                raise ConfigError(f"SQL file not found: {needed}")
         raw_date = _require("REPORTING_DATE")
         try:
             reporting_date = date.fromisoformat(raw_date)
         except ValueError:
             raise ConfigError(f"REPORTING_DATE must be YYYY-MM-DD, got {raw_date!r}") from None
-        results = load_all(data_dir / "clean", schema_file, settings, reporting_date)
+        results = load_all(data_dir / "clean", schema_file, settings, reporting_date, views_file)
     except PulseIQError as exc:
         log.error("STATUS=FAILED_CONFIG: %s", exc)
         return 2
