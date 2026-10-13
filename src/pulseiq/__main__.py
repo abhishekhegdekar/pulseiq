@@ -41,10 +41,32 @@ def run_pipeline(cfg: Config, record: dict) -> int:
         cleaned = {name: transform(name, df) for name, df in frames.items()}
 
         schemas = build_schemas(cfg.reporting_date)
-        results = {"employee": validate("employee", *cleaned["employee"], schemas["employee"])}
-        valid_keys = set(results["employee"][0]["employee_key"])  # facts must point at a valid employee
-        for name in ("payroll", "attendance", "leave"):
-            results[name] = validate(name, *cleaned[name], schemas[name], valid_keys)
+        results = {}
+
+        def check(name, **kwargs):
+            results[name] = validate(name, *cleaned[name], schemas[name], **kwargs)
+
+        def valid(name, column):  # values found in the VALID rows of an already-validated dataset
+            return set(results[name][0][column])
+
+        # Dimensions first, then whatever points at them (references use valid rows only).
+        check("department")
+        check("leave_type")
+        check("date")
+        departments = ("department_id", valid("department", "department_id"), "departments")
+        dates = valid("date", "date_key")
+        check("role", references=[departments])
+        roles = ("role_id", valid("role", "role_id"), "roles")
+        check("employee", references=[departments, roles])
+        lookup = results["employee"][0].set_index("employee_key")[["department_id", "role_id"]]
+        employee_ref = ("employee_key", set(lookup.index), "employees")
+        check("payroll", employee_lookup=lookup,
+              references=[employee_ref, departments, roles, ("date_key", dates, "dates")])
+        check("attendance", employee_lookup=lookup,
+              references=[employee_ref, departments, ("date_key", dates, "dates")])
+        check("leave", references=[
+            employee_ref, ("leave_type_code", valid("leave_type", "leave_type_code"), "leave types"),
+            ("start_date_key", dates, "dates"), ("end_date_key", dates, "dates")])
 
         record["datasets"] = {name: stats for name, (_, _, stats) in results.items()}
         totals = {key: sum(stats[key] for _, _, stats in results.values())

@@ -60,16 +60,72 @@ def leave_row(**kw):
     return {**row, **kw}
 
 
-ROWS = {"employee": employee_row, "payroll": payroll_row, "attendance": attendance_row, "leave": leave_row}
+def department_row(**kw):
+    row = dict(department_id="D01", department_name="Engineering", cost_center="CC-100",
+               description="Builds the product", is_leadership="N")
+    return {**row, **kw}
+
+
+def role_row(**kw):
+    row = dict(role_id="R002", department_id="D01", role_title="Engineer", level=1,
+               grade="L1 Associate", band_min_annual=400000, band_mid_annual=500000,
+               band_max_annual=650000, overtime_eligible="N", band_reference_year=2026)
+    return {**row, **kw}
+
+
+def leave_type_row(**kw):
+    row = dict(leave_type_code="CL", leave_type_name="Casual Leave", pay_type="Paid",
+               annual_quota_days=12, prorated_for_joiners="Y", carry_forward_allowed="N",
+               max_carry_forward_days=0, policy_note="Short-notice personal leave")
+    return {**row, **kw}
+
+
+def date_frame():
+    """A fake calendar for January 2026 (every day, weekends flagged)."""
+    days = pd.date_range("2026-01-01", "2026-01-31")
+    weekend = [d.dayofweek >= 5 for d in days]
+    return pd.DataFrame({
+        "date": days, "date_key": days.strftime("%Y%m%d").astype("int64"), "year": 2026, "quarter": 1,
+        "month_number": 1, "month_name": "January", "year_month": "2026-01",
+        "week_of_year": days.isocalendar().week.astype(int).values, "day_of_week": days.day_name(),
+        "is_weekend": ["Y" if w else "N" for w in weekend], "is_holiday": "N",
+        "is_working_day": ["N" if w else "Y" for w in weekend], "financial_year": "FY2025-26",
+        "fiscal_quarter": "Q4", "fiscal_month_number": 10,
+        "is_month_end": ["Y" if d.day == 31 else "N" for d in days],
+        "month_start_date": D("2026-01-01"), "month_end_date": D("2026-01-31")})
+
+
+ROWS = {"employee": employee_row, "payroll": payroll_row, "attendance": attendance_row, "leave": leave_row,
+        "department": department_row, "role": role_row, "leave_type": leave_type_row}
 
 
 def frame(name, *overrides):
+    if name == "date":
+        return date_frame()
     return pd.DataFrame([ROWS[name](**o) for o in (overrides or [{}])])
 
 
-def run(name, df, keys=frozenset({1})):
+# What the pipeline would pass in as "valid values" for this tiny fixture world.
+LOOKUP = pd.DataFrame({"department_id": ["D01"], "role_id": ["R002"]},
+                      index=pd.Index([1], name="employee_key"))
+DEPT = ("department_id", {"D01"}, "departments")
+ROLE = ("role_id", {"R002"}, "roles")
+EMP = ("employee_key", {1}, "employees")
+DATE_KEYS = set(date_frame()["date_key"])
+DATES = ("date_key", DATE_KEYS, "dates")
+DEFAULT_REFS = {
+    "role": dict(references=[DEPT]),
+    "employee": dict(references=[DEPT, ROLE]),
+    "payroll": dict(references=[EMP, DEPT, ROLE, DATES], employee_lookup=LOOKUP),
+    "attendance": dict(references=[EMP, DEPT, DATES], employee_lookup=LOOKUP),
+    "leave": dict(references=[EMP, ("leave_type_code", {"CL"}, "leave types"),
+                              ("start_date_key", DATE_KEYS, "dates"), ("end_date_key", DATE_KEYS, "dates")]),
+}
+
+
+def run(name, df, **overrides):
     transformed, stats = transform(name, df)
-    return validate(name, transformed, stats, SCHEMAS[name], None if name == "employee" else set(keys))
+    return validate(name, transformed, stats, SCHEMAS[name], **{**DEFAULT_REFS.get(name, {}), **overrides})
 
 
 def reasons(rejected):
@@ -177,6 +233,80 @@ def test_name_whitespace_is_trimmed_but_spelling_is_kept():
     assert clean["full_name"].iloc[0] == "Abhishek DSouza"
 
 
+# ---------- dimensions, references and version consistency ----------
+
+def test_role_pointing_at_an_unknown_department_is_rejected():
+    clean, rejected, _ = run("role", frame("role", {"department_id": "D99"}))
+    assert clean.empty and "department_id: not found among valid departments" in reasons(rejected)
+
+
+def test_employee_pointing_at_an_unknown_role_is_rejected():
+    _, rejected, _ = run("employee", frame("employee", {"role_id": "R999"}))
+    assert "role_id: not found among valid roles" in reasons(rejected)
+
+
+def test_pay_band_with_min_above_max_is_rejected():
+    _, rejected, _ = run("role", frame("role", {"band_min_annual": 900000}))
+    assert "pay_band_out_of_order" in reasons(rejected)
+
+
+def test_calendar_date_key_must_match_the_date():
+    cal = date_frame()
+    cal.loc[3, "date_key"] = 19990101
+    _, rejected, _ = run("date", cal)
+    assert "date_key_does_not_match_date" in reasons(rejected)
+
+
+def test_calendar_working_day_flag_must_agree_with_weekend_and_holiday_flags():
+    cal = date_frame()
+    cal.loc[0, "is_working_day"] = "N"  # 1 Jan 2026 is a Thursday and not a holiday
+    _, rejected, _ = run("date", cal)
+    assert "working_day_flag_inconsistent" in reasons(rejected)
+
+
+def test_valid_calendar_passes():
+    clean, rejected, _ = run("date", date_frame())
+    assert len(clean) == 31 and rejected.empty
+
+
+def test_payroll_on_a_date_missing_from_the_calendar_is_rejected():
+    _, rejected, _ = run("payroll", frame("payroll", {"date_key": 20991231}))
+    assert "date_key: not found among valid dates" in reasons(rejected)
+
+
+def test_payroll_department_must_match_the_employee_version():
+    _, rejected, _ = run("payroll", frame("payroll", {"department_id": "D02"}), references=[EMP])
+    assert "department_id: does not match the employee version" in reasons(rejected)
+
+
+def test_payroll_role_must_match_the_employee_version():
+    _, rejected, _ = run("payroll", frame("payroll", {"role_id": "R009"}), references=[EMP])
+    assert "role_id: does not match the employee version" in reasons(rejected)
+
+
+def test_attendance_department_must_match_the_employee_version():
+    _, rejected, _ = run("attendance", frame("attendance", {"department_id": "D02"}), references=[EMP])
+    assert "department_id: does not match the employee version" in reasons(rejected)
+
+
+def test_leave_with_unknown_leave_type_is_rejected():
+    _, rejected, _ = run("leave", frame("leave", {"leave_type_code": "XX"}))
+    assert "leave_type_code: not found among valid leave types" in reasons(rejected)
+
+
+def test_leave_dates_missing_from_the_calendar_are_rejected():
+    _, rejected, _ = run("leave", frame("leave", {"start_date_key": 20991231}))
+    assert "start_date_key: not found among valid dates" in reasons(rejected)
+
+
+def test_overlapping_employee_versions_warn_but_are_not_rejected():
+    df = frame("employee", {"is_current": "N", "valid_to": D("2021-02-01")},
+               {"employee_key": 2, "valid_from": D("2021-01-15")})
+    clean, rejected, stats = run("employee", df)
+    assert len(clean) == 2 and rejected.empty
+    assert stats["warnings"] == {"overlapping_versions": 1}
+
+
 # ---------- tenure ----------
 
 def test_tenure_uses_fixed_reporting_date_for_active_staff():
@@ -218,10 +348,11 @@ def test_valid_input_publishes_clean_files_and_logs_success(env):
     write_workbook(env / "in.xlsx")
     assert main() == 0
     assert sorted(p.name for p in (env / "data" / "clean").iterdir()) == [
-        "attendance.parquet", "employee.parquet", "leave.parquet", "payroll.parquet"]
+        "attendance.parquet", "date.parquet", "department.parquet", "employee.parquet",
+        "leave.parquet", "leave_type.parquet", "payroll.parquet", "role.parquet"]
     record = last_log(env)
     assert record["status"] == "SUCCESS" and record["published"] is True
-    assert record["totals"]["rows_in"] == 4 and record["totals"]["rows_rejected"] == 0
+    assert record["totals"]["rows_in"] == 4 + 3 + 31 and record["totals"]["rows_rejected"] == 0
     assert not (env / "data" / "_staging").exists()
 
 
@@ -248,6 +379,16 @@ def test_override_publishes_clean_rows_and_still_saves_rejects(env, monkeypatch)
     assert last_log(env)["status"] == "SUCCESS_WITH_REJECTS_OVERRIDE"
     assert len(pd.read_parquet(env / "data" / "clean" / "payroll.parquet")) == 1
     assert len(pd.read_csv(env / "data" / "rejected" / "payroll_rejected.csv")) == 1
+
+
+def test_bad_dimension_row_fails_the_run_and_rejects_everything_that_depends_on_it(env):
+    write_workbook(env / "in.xlsx", role=frame("role", {"department_id": "D99"}))
+    assert main() == 1
+    rejected = env / "data" / "rejected"
+    assert len(pd.read_csv(rejected / "role_rejected.csv")) == 1
+    assert len(pd.read_csv(rejected / "employee_rejected.csv")) == 1  # its role is gone
+    assert len(pd.read_csv(rejected / "payroll_rejected.csv")) == 1   # its employee is gone
+    assert last_log(env)["status"] == "FAILED_VALIDATION"
 
 
 def test_missing_workbook_is_a_structural_failure_with_exit_code_2(env):

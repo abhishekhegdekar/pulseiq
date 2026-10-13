@@ -12,6 +12,10 @@ import pandas as pd
 log = logging.getLogger("pulseiq.transform")
 
 DATE_COLS: dict[str, list[str]] = {
+    "department": [],
+    "role": [],
+    "leave_type": [],
+    "date": ["date", "month_start_date", "month_end_date"],
     "employee": ["date_of_birth", "hire_date", "exit_date", "valid_from", "valid_to"],
     "payroll": ["period_end_date"],
     "attendance": ["period_end_date"],
@@ -19,6 +23,10 @@ DATE_COLS: dict[str, list[str]] = {
 }
 
 NUMERIC_COLS: dict[str, list[str]] = {
+    "department": [],
+    "role": ["level", "band_min_annual", "band_mid_annual", "band_max_annual", "band_reference_year"],
+    "leave_type": ["annual_quota_days", "max_carry_forward_days"],
+    "date": ["date_key", "year", "quarter", "month_number", "week_of_year", "fiscal_month_number"],
     "employee": ["employee_key", "job_level"],
     "payroll": [
         "employee_key", "date_key", "payable_days", "lop_days", "overtime_hours_paid",
@@ -38,6 +46,10 @@ NUMERIC_COLS: dict[str, list[str]] = {
 
 # Columns that are only row labels. Two rows that differ ONLY in these are the same record.
 DEDUPE_IGNORE: dict[str, list[str]] = {
+    "department": [],
+    "role": [],
+    "leave_type": [],
+    "date": [],
     "employee": [],
     "payroll": ["payroll_item_id"],
     "attendance": ["attendance_fact_id"],

@@ -14,6 +14,23 @@ log = logging.getLogger("pulseiq.extract")
 
 # dataset name -> (sheet name in the workbook, columns we require)
 SOURCES: dict[str, tuple[str, list[str]]] = {
+    "department": ("dim_department", [
+        "department_id", "department_name", "cost_center", "description", "is_leadership",
+    ]),
+    "role": ("dim_role", [
+        "role_id", "department_id", "role_title", "level", "grade", "band_min_annual",
+        "band_mid_annual", "band_max_annual", "overtime_eligible", "band_reference_year",
+    ]),
+    "leave_type": ("dim_leave_type", [
+        "leave_type_code", "leave_type_name", "pay_type", "annual_quota_days",
+        "prorated_for_joiners", "carry_forward_allowed", "max_carry_forward_days", "policy_note",
+    ]),
+    "date": ("dim_date", [
+        "date", "date_key", "year", "quarter", "month_number", "month_name", "year_month",
+        "week_of_year", "day_of_week", "is_weekend", "is_holiday", "is_working_day",
+        "financial_year", "fiscal_quarter", "fiscal_month_number", "is_month_end",
+        "month_start_date", "month_end_date",
+    ]),
     "employee": ("dim_employee", [
         "employee_key", "employee_id", "full_name", "gender", "date_of_birth",
         "hire_date", "exit_date", "employment_status", "employment_type",

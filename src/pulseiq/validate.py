@@ -6,8 +6,13 @@ Two kinds of problem are kept apart:
 
 Reject reasons name the column and the rule, never the value, so salary figures
 do not leak into logs.
+
+Rows can also be rejected because they point at something that is not valid:
+an unknown (or itself rejected) department, role, date, leave type or employee,
+or a department/role that disagrees with the employee version they point at.
 """
 import logging
+from collections.abc import Sequence
 from datetime import date
 
 import pandas as pd
@@ -30,11 +35,16 @@ ATTENDANCE_NONNEGATIVE = [
     "unpaid_absence_days", "late_arrivals", "avg_hours_worked", "overtime_hours",
 ]
 
-
+# Whole-row checks: pandera reports them once per column, so we name only the rule.
 ROW_LEVEL_CHECKS = {
     "hire_date_after_exit_date", "valid_from_after_valid_to",
     "duplicate_current_employee_id", "end_date_before_start_date",
+    "pay_band_out_of_order", "date_key_does_not_match_date", "working_day_flag_inconsistent",
 }
+
+# A reference says: values of `column` must be found in `valid_values` (a set taken from
+# the VALID rows of another dataset). `label` only appears in the reject reason.
+Reference = tuple[str, set, str]
 
 
 def _nonneg() -> pa.Column:
@@ -45,8 +55,71 @@ def _required() -> pa.Column:
     return pa.Column(nullable=False)
 
 
+def _yes_no(nullable: bool = False) -> pa.Column:
+    return pa.Column(checks=pa.Check.isin(["Y", "N"]), nullable=nullable)
+
+
+def _unique_current_employee_id(df: pd.DataFrame) -> pd.Series:
+    """True for rows that are fine; False where a current employee_id appears twice."""
+    current = df["is_current"].eq("Y")
+    dup = df.loc[current, "employee_id"].duplicated(keep=False)
+    return ~dup.reindex(df.index, fill_value=False)
+
+
+def _working_day_consistent(df: pd.DataFrame) -> pd.Series:
+    expected = (df["is_weekend"].eq("N") & df["is_holiday"].eq("N")).map({True: "Y", False: "N"})
+    return df["is_working_day"].eq(expected)
+
+
 def build_schemas(reporting_date: date) -> dict[str, pa.DataFrameSchema]:
     cutoff = pd.Timestamp(reporting_date)
+
+    department = pa.DataFrameSchema(columns={
+        "department_id": pa.Column(nullable=False, unique=True),
+        "department_name": pa.Column(nullable=False, unique=True),
+        "cost_center": pa.Column(nullable=False, unique=True),
+        "is_leadership": _yes_no(),
+    })
+
+    role = pa.DataFrameSchema(
+        columns={
+            "role_id": pa.Column(nullable=False, unique=True),
+            "department_id": _required(),
+            "role_title": _required(),
+            "level": pa.Column(checks=pa.Check.in_range(1, 7), nullable=False),
+            "band_min_annual": pa.Column(checks=pa.Check.gt(0), nullable=False),
+            "band_mid_annual": pa.Column(checks=pa.Check.gt(0), nullable=False),
+            "band_max_annual": pa.Column(checks=pa.Check.gt(0), nullable=False),
+            "overtime_eligible": _yes_no(),
+        },
+        checks=[pa.Check(lambda df: (df["band_min_annual"] <= df["band_mid_annual"])
+                         & (df["band_mid_annual"] <= df["band_max_annual"]),
+                         name="pay_band_out_of_order")],
+    )
+
+    leave_type = pa.DataFrameSchema(columns={
+        "leave_type_code": pa.Column(nullable=False, unique=True),
+        "leave_type_name": _required(),
+        "pay_type": pa.Column(checks=pa.Check.isin(["Paid", "Unpaid"]), nullable=False),
+        "annual_quota_days": _nonneg(),
+        "max_carry_forward_days": _nonneg(),
+    })
+
+    calendar = pa.DataFrameSchema(
+        columns={
+            "date": pa.Column(pa.DateTime, nullable=False, unique=True),
+            "date_key": pa.Column(nullable=False, unique=True),
+            "is_weekend": _yes_no(),
+            "is_holiday": _yes_no(),
+            "is_working_day": _yes_no(),
+            "is_month_end": _yes_no(),
+        },
+        checks=[
+            pa.Check(lambda df: df["date_key"] == df["date"].dt.strftime("%Y%m%d").astype("int64"),
+                     name="date_key_does_not_match_date"),
+            pa.Check(_working_day_consistent, name="working_day_flag_inconsistent"),
+        ],
+    )
 
     employee = pa.DataFrameSchema(
         columns={
@@ -108,14 +181,8 @@ def build_schemas(reporting_date: date) -> dict[str, pa.DataFrameSchema]:
         checks=[pa.Check(lambda df: df["end_date"] >= df["start_date"],
                          name="end_date_before_start_date")],
     )
-    return {"employee": employee, "payroll": payroll, "attendance": attendance, "leave": leave}
-
-
-def _unique_current_employee_id(df: pd.DataFrame) -> pd.Series:
-    """True for rows that are fine; False where a current employee_id appears twice."""
-    current = df["is_current"].eq("Y")
-    dup = df.loc[current, "employee_id"].duplicated(keep=False)
-    return ~dup.reindex(df.index, fill_value=False)
+    return {"department": department, "role": role, "leave_type": leave_type, "date": calendar,
+            "employee": employee, "payroll": payroll, "attendance": attendance, "leave": leave}
 
 
 def _schema_reasons(schema: pa.DataFrameSchema, df: pd.DataFrame, name: str) -> pd.Series:
@@ -142,25 +209,48 @@ def _schema_reasons(schema: pa.DataFrameSchema, df: pd.DataFrame, name: str) -> 
     return reasons
 
 
+def _add(reasons: pd.Series, mask: pd.Series, text: str) -> None:
+    """Append `text` to the reason of every row where mask is True."""
+    reasons.loc[mask] = reasons.loc[mask].map(lambda s: f"{s}; {text}" if s else text)
+
+
+def count_overlapping_versions(df: pd.DataFrame) -> int:
+    """History versions of one employee whose validity window overlaps the next version's."""
+    ordered = df.sort_values(["employee_id", "valid_from"])
+    next_from = ordered.groupby("employee_id")["valid_from"].shift(-1)
+    return int((next_from.notna() & (next_from <= ordered["valid_to"])).sum())
+
+
 def validate(name: str, df: pd.DataFrame, transform_stats: dict, schema: pa.DataFrameSchema,
-             valid_employee_keys: set | None = None) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
-    """Return (clean rows, rejected rows, stats) for one dataset."""
+             references: Sequence[Reference] = (),
+             employee_lookup: pd.DataFrame | None = None) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
+    """Return (clean rows, rejected rows, stats) for one dataset.
+
+    references:      (column, valid values, label): rows whose value is not in the set are rejected.
+    employee_lookup: DataFrame indexed by employee_key with department_id / role_id; fact rows
+                     must agree with the employee version they point at.
+    """
     reasons = _schema_reasons(schema, df, name)
 
-    if valid_employee_keys is not None:  # facts must point at a valid employee
-        orphan = ~df["employee_key"].isin(valid_employee_keys)
-        reasons = reasons.where(~orphan, reasons.map(
-            lambda s: f"{s}; employee_key: not found among valid employees" if s
-            else "employee_key: not found among valid employees"))
+    for column, valid_values, label in references:
+        _add(reasons, df[column].notna() & ~df[column].isin(valid_values),
+             f"{column}: not found among valid {label}")
+
+    if employee_lookup is not None:
+        known = df["employee_key"].isin(employee_lookup.index)
+        for column in ("department_id", "role_id"):
+            if column in df.columns:
+                expected = df["employee_key"].map(employee_lookup[column])
+                _add(reasons, known & (df[column] != expected),
+                     f"{column}: does not match the employee version")
 
     all_reasons = pd.Series(
         [("; ".join(x for x in (a, b) if x)) for a, b in zip(df["_issues"], reasons)],
         index=df.index, dtype="object")
     bad = all_reasons != ""
 
-    helper = ["_issues"]
-    clean = df.loc[~bad].drop(columns=helper + ["source_row"])
-    rejected = df.loc[bad].drop(columns=helper).assign(reject_reason=all_reasons[bad], dataset=name)
+    clean = df.loc[~bad].drop(columns=["_issues", "source_row"])
+    rejected = df.loc[bad].drop(columns=["_issues"]).assign(reject_reason=all_reasons[bad], dataset=name)
     rejected = rejected[["dataset", "source_row", "reject_reason"]
                         + [c for c in rejected.columns if c not in ("dataset", "source_row", "reject_reason")]]
 
@@ -170,6 +260,11 @@ def validate(name: str, df: pd.DataFrame, transform_stats: dict, schema: pa.Data
         "rows_rejected": len(rejected),
         "rows_out": len(clean),
     }
+    if name == "employee":  # a warning, not a rejection: the "latest valid_from" rule still picks one version
+        overlaps = count_overlapping_versions(df)
+        stats["warnings"] = {"overlapping_versions": overlaps}
+        if overlaps:
+            log.warning("employee: %d history version(s) overlap the next version's validity window", overlaps)
     if stats["rows_in"] != stats["rows_out"] + stats["rows_rejected"] + stats["duplicates_removed"]:
         raise PulseIQError(f"Row reconciliation failed for {name}: {stats}")
     log.info("Validated %-10s %s", name, stats)

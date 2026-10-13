@@ -16,6 +16,10 @@ import pandas as pd
 log = logging.getLogger("pulseiq.publish")
 
 SORT_KEYS = {
+    "department": ["department_id"],
+    "role": ["role_id"],
+    "leave_type": ["leave_type_code"],
+    "date": ["date_key"],
     "employee": ["employee_key"],
     "payroll": ["date_key", "employee_key"],
     "attendance": ["date_key", "employee_key"],
