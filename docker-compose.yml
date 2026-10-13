@@ -1,0 +1,8 @@
+services:
+  etl:
+    build: .
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+      - ./data/raw:/app/data/raw:ro
+      - ./logs:/app/logs
