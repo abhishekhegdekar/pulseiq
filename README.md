@@ -110,3 +110,4 @@ Loading twice changes nothing (0 inserted, 0 updated).
 - Keys, SCD2 and the department-transfer rule: `docs/scd2_keys_and_transfers.md`
 - Headcount rules and validation: `docs/headcount_validation.md`
 - Answers: `sql/q1..q4_*.sql`
+- Dashboard style guide: docs/style_guide.md
