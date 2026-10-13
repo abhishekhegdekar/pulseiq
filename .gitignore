@@ -1,0 +1,13 @@
+# Data and outputs (employee/salary data must never be committed)
+data/
+logs/
+# Local environment and secrets
+.env
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+# macOS / editor
+.DS_Store
+.vscode/
