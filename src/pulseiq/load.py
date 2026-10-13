@@ -12,12 +12,14 @@ Rules
 import logging
 import os
 import sys
+from datetime import date
 from pathlib import Path
 
 import pandas as pd
 import psycopg
 from psycopg import sql
 
+from pulseiq.config import _require
 from pulseiq.errors import ConfigError, PulseIQError
 
 log = logging.getLogger("pulseiq.load")
@@ -111,7 +113,53 @@ def upsert_table(cur, table: str, key: list[str], df: pd.DataFrame) -> dict:
             "unchanged": len(df) - len(flags), "not_in_source": not_in_source}
 
 
-def load_all(clean_dir: Path, schema_file: Path, settings: dict) -> dict:
+# One row per employee per month-end while employed. Rules (docs/warehouse_design.md):
+#  - employed at month end: hire_date <= month end and (no exit_date or exit_date > month end)
+#  - department/role come from the latest version with valid_from <= month end (as-of rule)
+HEADCOUNT_SQL = """
+WITH person AS (
+    SELECT employee_id, min(hire_date) AS hire_date, max(exit_date) AS exit_date
+    FROM dim_employee GROUP BY employee_id
+)
+SELECT DISTINCT ON (e.employee_id, d.date)
+       d.date AS month_end_date, e.employee_id, e.employee_key, e.department_id, e.role_id
+FROM dim_date d
+JOIN person p ON p.hire_date <= d.date AND (p.exit_date IS NULL OR p.exit_date > d.date)
+JOIN dim_employee e ON e.employee_id = p.employee_id AND e.valid_from <= d.date
+WHERE d.is_month_end = 'Y' AND d.date <= %(reporting_date)s
+ORDER BY e.employee_id, d.date, e.valid_from DESC
+"""
+
+
+def build_headcount(cur, reporting_date: date) -> dict:
+    """Rebuild fact_headcount_monthly from dim_employee. Fully determined by the
+    dimensions, so rows that no longer belong are deleted (this table only)."""
+    cur.execute("DROP TABLE IF EXISTS pg_temp.hc_new")
+    cur.execute("CREATE TEMP TABLE hc_new AS " + HEADCOUNT_SQL, {"reporting_date": reporting_date})
+    cur.execute("SELECT count(*) FROM hc_new")
+    built = cur.fetchone()[0]
+    cur.execute(
+        "DELETE FROM fact_headcount_monthly h WHERE NOT EXISTS ("
+        "SELECT 1 FROM hc_new n WHERE n.employee_id = h.employee_id "
+        "AND n.month_end_date = h.month_end_date)")
+    deleted = cur.rowcount
+    cur.execute(
+        "INSERT INTO fact_headcount_monthly (month_end_date, employee_id, employee_key, department_id, role_id) "
+        "SELECT month_end_date, employee_id, employee_key, department_id, role_id FROM hc_new "
+        "ON CONFLICT (employee_id, month_end_date) DO UPDATE SET "
+        "employee_key = EXCLUDED.employee_key, department_id = EXCLUDED.department_id, "
+        "role_id = EXCLUDED.role_id "
+        "WHERE (fact_headcount_monthly.employee_key, fact_headcount_monthly.department_id, "
+        "fact_headcount_monthly.role_id) IS DISTINCT FROM "
+        "(EXCLUDED.employee_key, EXCLUDED.department_id, EXCLUDED.role_id) "
+        "RETURNING (xmax = 0)")
+    flags = [r[0] for r in cur.fetchall()]
+    cur.execute("DROP TABLE pg_temp.hc_new")
+    return {"rows_in_file": built, "inserted": sum(flags), "updated": len(flags) - sum(flags),
+            "unchanged": built - len(flags), "not_in_source": 0, "deleted": deleted}
+
+
+def load_all(clean_dir: Path, schema_file: Path, settings: dict, reporting_date: date) -> dict:
     frames = {}
     for name, _, _ in LOAD_ORDER:
         path = clean_dir / f"{name}.parquet"
@@ -125,7 +173,9 @@ def load_all(clean_dir: Path, schema_file: Path, settings: dict) -> dict:
             cur.execute(schema_file.read_text(encoding="utf-8"))   # idempotent
             for name, table, key in LOAD_ORDER:
                 results[table] = upsert_table(cur, table, key, frames[name])
-                log.info("Loaded %-16s %s", table, results[table])
+                log.info("Loaded %-22s %s", table, results[table])
+            results["fact_headcount_monthly"] = build_headcount(cur, reporting_date)
+            log.info("Built  %-22s %s", "fact_headcount_monthly", results["fact_headcount_monthly"])
     return results
 
 
@@ -138,15 +188,20 @@ def main() -> int:
         schema_file = Path(os.environ.get("SCHEMA_FILE", "sql/01_schema.sql"))
         if not schema_file.exists():
             raise ConfigError(f"Schema file not found: {schema_file}")
-        results = load_all(data_dir / "clean", schema_file, settings)
+        raw_date = _require("REPORTING_DATE")
+        try:
+            reporting_date = date.fromisoformat(raw_date)
+        except ValueError:
+            raise ConfigError(f"REPORTING_DATE must be YYYY-MM-DD, got {raw_date!r}") from None
+        results = load_all(data_dir / "clean", schema_file, settings, reporting_date)
     except PulseIQError as exc:
         log.error("STATUS=FAILED_CONFIG: %s", exc)
         return 2
     except Exception:
         log.exception("STATUS=FAILED_UNEXPECTED (nothing was committed)")
         return 3
-    totals = {k: sum(r[k] for r in results.values())
-              for k in ("rows_in_file", "inserted", "updated", "unchanged", "not_in_source")}
+    totals = {k: sum(r.get(k, 0) for r in results.values())
+              for k in ("rows_in_file", "inserted", "updated", "unchanged", "not_in_source", "deleted")}
     log.info("Totals: %s", totals)
     log.info("STATUS=SUCCESS")
     return 0

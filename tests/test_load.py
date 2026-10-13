@@ -35,3 +35,16 @@ def test_parents_load_before_children():
 def test_every_clean_dataset_is_loaded_once():
     assert sorted(n for n, _, _ in LOAD_ORDER) == sorted(
         ["department", "leave_type", "date", "role", "employee", "payroll", "attendance", "leave"])
+
+
+def test_headcount_compare_reports_only_real_differences():
+    import datetime as dt
+    from pulseiq.check_headcount import compare
+    d1, d2 = dt.date(2026, 1, 31), dt.date(2026, 2, 28)
+    sheet = pd.DataFrame({"month_end_date": [d1, d1, d2], "department_id": ["D01", "D02", "D01"],
+                          "headcount_end": [5, 3, 0]})
+    db = pd.DataFrame({"month_end_date": [d1, d1, d2], "department_id": ["D01", "D02", "D03"],
+                       "warehouse": [5, 4, 2]})
+    diff = compare(sheet, db)
+    assert list(zip(diff["department_id"], diff["headcount_end"], diff["warehouse"])) == \
+        [("D02", 3, 4), ("D03", 0, 2)]
