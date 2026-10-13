@@ -1,0 +1,69 @@
+erDiagram
+    dim_department ||--o{ dim_role : "  "
+    dim_department ||--o{ dim_employee : "  "
+    dim_role ||--o{ dim_employee : "  "
+    dim_employee ||--o{ fact_payroll : "  "
+    dim_employee ||--o{ fact_attendance : "  "
+    dim_employee ||--o{ fact_leave : "  "
+    dim_employee ||--o{ fact_headcount_monthly : "  "
+    dim_date ||--o{ fact_payroll : "  "
+    dim_date ||--o{ fact_attendance : "  "
+    dim_date ||--o{ fact_leave : "  "
+    dim_leave_type ||--o{ fact_leave : "  "
+
+    dim_department {
+        text department_id PK
+        text department_name
+    }
+    dim_role {
+        text role_id PK
+        text department_id FK
+        text role_title
+    }
+    dim_employee {
+        int employee_key PK "surrogate key"
+        text employee_id "natural key"
+        text department_id FK
+        text role_id FK
+        date valid_from "SCD2"
+        date valid_to "SCD2"
+        char is_current
+    }
+    dim_date {
+        int date_key PK "yyyymmdd"
+        date date
+        char year_month
+    }
+    dim_leave_type {
+        text leave_type_code PK
+        text pay_type
+    }
+    fact_payroll {
+        int employee_key PK, FK "GRAIN employee version x payroll run"
+        text run_id PK
+        int date_key FK
+        text department_id "copy"
+        text role_id "copy"
+        numeric employer_cost
+    }
+    fact_attendance {
+        int employee_key PK, FK "GRAIN employee version x month"
+        int date_key PK, FK
+        text department_id "copy"
+        numeric attendance_rate
+    }
+    fact_leave {
+        text leave_request_id PK "GRAIN one leave request"
+        int employee_key FK
+        text leave_type_code FK
+        int start_date_key FK
+        int end_date_key FK
+        numeric days
+    }
+    fact_headcount_monthly {
+        text employee_id PK "GRAIN employee x month-end"
+        date month_end_date PK
+        int employee_key FK
+        text department_id FK
+        text role_id FK
+    }
