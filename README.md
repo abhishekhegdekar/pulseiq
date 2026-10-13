@@ -89,3 +89,4 @@ dashboards/    exported dashboards (Task 3)
 - 82 payroll rows in the raw sheet carry a `period_end_date` outside the validity window of the employee version their `employee_key` points to. Not treated as an error in Task 1; to be investigated in Task 2.
 - Reject files contain full row data (including pay). Keep them local.
 - Dependencies are pinned in `requirements.txt` (pandas 3.0.6, pandera 0.34.1, pyarrow 26.0.0, openpyxl 3.1.5) on Python 3.13.
+- Warehouse schema diagram: docs/schema_diagram.png (SQL in sql/01_schema.sql)
