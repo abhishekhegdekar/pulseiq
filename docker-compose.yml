@@ -28,5 +28,20 @@ services:
       retries: 10
     restart: unless-stopped
 
+  load:
+    build:
+      context: .
+      target: base
+    command: python -m pulseiq.load
+    env_file: .env
+    environment:
+      POSTGRES_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data:ro
+      - ./sql:/app/sql:ro
+
 volumes:
   pgdata:
