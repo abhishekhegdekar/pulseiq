@@ -111,3 +111,4 @@ Loading twice changes nothing (0 inserted, 0 updated).
 - Headcount rules and validation: `docs/headcount_validation.md`
 - Answers: `sql/q1..q4_*.sql`
 - Dashboard style guide: docs/style_guide.md
+- Dashboard design review and definitions: docs/dashboard_design_review.md
