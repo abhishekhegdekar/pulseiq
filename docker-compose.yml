@@ -1,8 +1,15 @@
 services:
   etl:
-    build: .
+    build:
+      context: .
+      target: base
     env_file: .env
     volumes:
       - ./data:/app/data
       - ./data/raw:/app/data/raw:ro
       - ./logs:/app/logs
+
+  tests:
+    build:
+      context: .
+      target: dev
