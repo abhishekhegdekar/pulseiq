@@ -14,6 +14,7 @@ import os
 import sys
 from datetime import date
 from pathlib import Path
+from urllib.parse import unquote, urlparse
 
 import pandas as pd
 import psycopg
@@ -51,16 +52,21 @@ def rows_from_frame(df: pd.DataFrame, columns: list[str]) -> list[tuple]:
 
 
 def _db_settings() -> dict:
-    missing = [n for n in ("POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD")
-               if not os.environ.get(n, "").strip()]
-    if missing:
-        raise ConfigError(f"Environment variable(s) not set: {', '.join(missing)}")
+    """Read DATABASE_URL, e.g. postgresql+psycopg://user:password@db:5432/dbname."""
+    url = os.environ.get("DATABASE_URL", "").strip()
+    if not url:
+        raise ConfigError("Environment variable DATABASE_URL is not set")
+    parsed = urlparse(url)
+    if (parsed.scheme not in ("postgresql", "postgresql+psycopg")
+            or not parsed.hostname or not parsed.username or not parsed.path.strip("/")):
+        raise ConfigError("DATABASE_URL must look like "
+                          "postgresql+psycopg://user:password@host:5432/dbname")
     return dict(
-        host=os.environ.get("POSTGRES_HOST", "localhost"),
-        port=int(os.environ.get("POSTGRES_PORT", "5432")),
-        dbname=os.environ["POSTGRES_DB"],
-        user=os.environ["POSTGRES_USER"],
-        password=os.environ["POSTGRES_PASSWORD"],
+        host=parsed.hostname,
+        port=parsed.port or 5432,
+        dbname=parsed.path.lstrip("/"),
+        user=unquote(parsed.username),
+        password=unquote(parsed.password or ""),
     )
 
 

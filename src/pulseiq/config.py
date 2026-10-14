@@ -14,6 +14,8 @@ class Config:
     allow_rejects: bool
     data_dir: Path
     log_dir: Path
+    env: str = "local"
+    source_mode: str = "file"
 
 
 def _require(name: str) -> str:
@@ -34,10 +36,16 @@ def load_config() -> Config:
     if raw_flag not in {"true", "false"}:
         raise ConfigError(f"ALLOW_REJECTS must be 'true' or 'false', got {raw_flag!r}")
 
+    source_mode = os.environ.get("SOURCE_MODE", "file").strip().lower()
+    if source_mode != "file":
+        raise ConfigError(f"SOURCE_MODE must be 'file' in Phase I (workbook input), got {source_mode!r}")
+
     return Config(
         input_workbook=Path(_require("INPUT_WORKBOOK")),
         reporting_date=reporting_date,
         allow_rejects=raw_flag == "true",
         data_dir=Path(os.environ.get("DATA_DIR", "data")),
         log_dir=Path(os.environ.get("LOG_DIR", "logs")),
+        env=os.environ.get("ENV", "local").strip() or "local",
+        source_mode=source_mode,
     )
