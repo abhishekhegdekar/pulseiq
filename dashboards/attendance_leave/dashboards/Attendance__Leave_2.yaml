@@ -1,0 +1,503 @@
+dashboard_title: Attendance & Leave
+description: null
+css: ''
+slug: null
+certified_by: ''
+certification_details: ''
+published: true
+uuid: 6542b9ac-12b2-4c03-bc68-3f7816369e4c
+position:
+  CHART-WMzX_uNzcOrUBCD7GDdzi:
+    children: []
+    id: CHART-WMzX_uNzcOrUBCD7GDdzi
+    meta:
+      chartId: 11
+      height: 50
+      sliceName: M13 Attendance rate, rolling 3 months
+      uuid: 5cad9d18-6a93-4c03-b9e6-38aac38fffa8
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-p-hgw1bwRNznVIIggb1KD
+    type: CHART
+  CHART-Z3PCAv3D2Uo8Upx-2cgS_:
+    children: []
+    id: CHART-Z3PCAv3D2Uo8Upx-2cgS_
+    meta:
+      chartId: 9
+      height: 50
+      sliceName: M13 Attendance rate by department (last 12 months)
+      uuid: 51137d83-adbb-4ab0-aecb-33e310ee019a
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-e2Sv8hmEZLeqyDyplNnIh
+    type: CHART
+  CHART-explore-12-1:
+    children: []
+    id: CHART-explore-12-1
+    meta:
+      chartId: 12
+      height: 50
+      sliceName: M14 Late arrival rate by month
+      uuid: 3361c3ee-345b-4b64-bb00-83c89ab75c44
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-P8-TONGrA-krvOaqRfiLg
+    type: CHART
+  CHART-explore-13-1:
+    children: []
+    id: CHART-explore-13-1
+    meta:
+      chartId: 13
+      height: 50
+      sliceName: M14 Late arrival rate by department (last 12 months)
+      uuid: 0f413b37-a5b5-4552-bb98-60199e86ba10
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-P8-TONGrA-krvOaqRfiLg
+    type: CHART
+  CHART-explore-14-1:
+    children: []
+    id: CHART-explore-14-1
+    meta:
+      chartId: 14
+      height: 50
+      sliceName: Approved leave starts by weekday (maternity excluded)
+      uuid: 6a3ba561-a97c-4c00-85b7-7b36d3cc76bb
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-VHmj7bu4z2HkAyyqrsgOb
+    type: CHART
+  CHART-explore-15-1:
+    children: []
+    id: CHART-explore-15-1
+    meta:
+      chartId: 15
+      height: 50
+      sliceName: AI/ML attendance flags by month, checked against monthly data
+      uuid: 23eeb53d-d363-4257-a9c2-b44baaa2b697
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-VHmj7bu4z2HkAyyqrsgOb
+    type: CHART
+  CHART-iJY8Cmmhrmq6_uYa9o8mI:
+    children: []
+    id: CHART-iJY8Cmmhrmq6_uYa9o8mI
+    meta:
+      chartId: 8
+      height: 50
+      sliceName: M13 Attendance rate by month
+      uuid: 4f23ad16-2bcd-43d2-851e-c1ccd455ec7f
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-p-hgw1bwRNznVIIggb1KD
+    type: CHART
+  CHART-xve97lw2IB_EPabjCbUMr:
+    children: []
+    id: CHART-xve97lw2IB_EPabjCbUMr
+    meta:
+      chartId: 10
+      height: 50
+      sliceName: Approved leave days by type
+      uuid: b5c9b014-1165-4d5c-b3ca-3b32059c875e
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-e2Sv8hmEZLeqyDyplNnIh
+    type: CHART
+  DASHBOARD_VERSION_KEY: v2
+  GRID_ID:
+    children:
+    - ROW-tXucsmushPQlu2kA7fb70
+    - ROW-p-hgw1bwRNznVIIggb1KD
+    - ROW-7QuwMBvXMN31bauxeFCKZ
+    - ROW-P8-TONGrA-krvOaqRfiLg
+    - ROW-UbfXY7rl4B50drB65If3J
+    - ROW-e2Sv8hmEZLeqyDyplNnIh
+    - ROW-sg0TRvTKz_gfr-CjEirbM
+    - ROW-VHmj7bu4z2HkAyyqrsgOb
+    - ROW-urnlFCmHhBs3xZpx4Teqj
+    id: GRID_ID
+    parents:
+    - ROOT_ID
+    type: GRID
+  HEADER_ID:
+    id: HEADER_ID
+    meta:
+      text: Attendance & Leave
+    type: HEADER
+  MARKDOWN-AcuOhVwG0_EbyWQaD-FF7:
+    children: []
+    id: MARKDOWN-AcuOhVwG0_EbyWQaD-FF7
+    meta:
+      code: 'Takeaway: Leave starts are spread fairly evenly across weekdays, from
+        575 on Monday to 650 on Thursday, so there is no strong weekday pattern. Of
+        the 221 AI/ML flagged employee-months, 38 are confirmed by the monthly data,
+        55 are contradicted and 128 cannot be checked. Treat the flags as a review
+        list, not as findings.'
+      height: 15
+      width: 12
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-urnlFCmHhBs3xZpx4Teqj
+    type: MARKDOWN
+  MARKDOWN-FbzeF3WwNfvLu11puO8Oi:
+    children: []
+    id: MARKDOWN-FbzeF3WwNfvLu11puO8Oi
+    meta:
+      code: 'Takeaway: Attendance runs from 95.2% (Sales) down to 88.7% (Finance &
+        Accounts). Finance & Accounts is a small team where a few long maternity leaves
+        pull the rate down, so it is not a sign of a broad problem. Earned, Casual
+        and Sick leave account for most approved leave days.'
+      height: 11
+      width: 12
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-sg0TRvTKz_gfr-CjEirbM
+    type: MARKDOWN
+  MARKDOWN-GWk5c3hJ6P2dmzwAfE-Ja:
+    children: []
+    id: MARKDOWN-GWk5c3hJ6P2dmzwAfE-Ja
+    meta:
+      code: 'Takeaway: Company attendance stays in a narrow band, about 93% to 95.5%
+        a month. The 3-month rate fell from a peak near 95.3% to a low near 93.2%
+        and has since recovered to about 94.5%. December sits between November and
+        January with no December-specific drop, but with only one December in the
+        data, seasonality cannot be tested.'
+      height: 13
+      width: 12
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-7QuwMBvXMN31bauxeFCKZ
+    type: MARKDOWN
+  MARKDOWN-XA1LEt4oYRrve6KqcYU67:
+    children: []
+    id: MARKDOWN-XA1LEt4oYRrve6KqcYU67
+    meta:
+      code: "Attendance & Leave \xB7 data to 30 Sep 2026 \xB7 synthetic (fake) data\n\
+        \n- Attendance rate = (present days + half of unpaid half-days) \xF7 scheduled\
+        \ days. Paid leave counts as not present.\n- Late rate = late arrivals \xF7\
+        \ present days.\n- The Department filter applies to the attendance, late-arrival\
+        \ and AI-flag charts. The two leave charts are company-wide.\n- Departments\
+        \ with fewer than 5 people are hidden, and the one-person Executive Office\
+        \ is excluded.\n- Attendance data is monthly, so \"weekday\" means the weekday\
+        \ a leave starts, not when people were absent."
+      height: 26
+      width: 12
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-tXucsmushPQlu2kA7fb70
+    type: MARKDOWN
+  MARKDOWN-kJ-qdL_Mox-swYcJDJw2o:
+    children: []
+    id: MARKDOWN-kJ-qdL_Mox-swYcJDJw2o
+    meta:
+      code: 'Takeaway: The monthly late rate moves between about 6.3% and 7.5%, peaking
+        in March 2026. By department, Operations & IT (8.7%) and Legal & Compliance
+        (7.6%) are clearly above the rest, which sit between 6.3% and 6.9%.'
+      height: 11
+      width: 12
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-UbfXY7rl4B50drB65If3J
+    type: MARKDOWN
+  ROOT_ID:
+    children:
+    - GRID_ID
+    id: ROOT_ID
+    type: ROOT
+  ROW-7QuwMBvXMN31bauxeFCKZ:
+    children:
+    - MARKDOWN-GWk5c3hJ6P2dmzwAfE-Ja
+    id: ROW-7QuwMBvXMN31bauxeFCKZ
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+  ROW-P8-TONGrA-krvOaqRfiLg:
+    children:
+    - CHART-explore-12-1
+    - CHART-explore-13-1
+    id: ROW-P8-TONGrA-krvOaqRfiLg
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+  ROW-UbfXY7rl4B50drB65If3J:
+    children:
+    - MARKDOWN-kJ-qdL_Mox-swYcJDJw2o
+    id: ROW-UbfXY7rl4B50drB65If3J
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+  ROW-VHmj7bu4z2HkAyyqrsgOb:
+    children:
+    - CHART-explore-14-1
+    - CHART-explore-15-1
+    id: ROW-VHmj7bu4z2HkAyyqrsgOb
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+  ROW-e2Sv8hmEZLeqyDyplNnIh:
+    children:
+    - CHART-Z3PCAv3D2Uo8Upx-2cgS_
+    - CHART-xve97lw2IB_EPabjCbUMr
+    id: ROW-e2Sv8hmEZLeqyDyplNnIh
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+  ROW-p-hgw1bwRNznVIIggb1KD:
+    children:
+    - CHART-iJY8Cmmhrmq6_uYa9o8mI
+    - CHART-WMzX_uNzcOrUBCD7GDdzi
+    id: ROW-p-hgw1bwRNznVIIggb1KD
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+  ROW-sg0TRvTKz_gfr-CjEirbM:
+    children:
+    - MARKDOWN-FbzeF3WwNfvLu11puO8Oi
+    id: ROW-sg0TRvTKz_gfr-CjEirbM
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+  ROW-tXucsmushPQlu2kA7fb70:
+    children:
+    - MARKDOWN-XA1LEt4oYRrve6KqcYU67
+    id: ROW-tXucsmushPQlu2kA7fb70
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+  ROW-urnlFCmHhBs3xZpx4Teqj:
+    children:
+    - MARKDOWN-AcuOhVwG0_EbyWQaD-FF7
+    id: ROW-urnlFCmHhBs3xZpx4Teqj
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+metadata:
+  chart_configuration:
+    '8':
+      id: 8
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 9
+        - 10
+        - 11
+        - 12
+        - 13
+        - 14
+        - 15
+    '9':
+      id: 9
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 8
+        - 10
+        - 11
+        - 12
+        - 13
+        - 14
+        - 15
+    '10':
+      id: 10
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 8
+        - 9
+        - 11
+        - 12
+        - 13
+        - 14
+        - 15
+    '11':
+      id: 11
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 8
+        - 9
+        - 10
+        - 12
+        - 13
+        - 14
+        - 15
+    '12':
+      id: 12
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 8
+        - 9
+        - 10
+        - 11
+        - 13
+        - 14
+        - 15
+    '13':
+      id: 13
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 8
+        - 9
+        - 10
+        - 11
+        - 12
+        - 14
+        - 15
+    '14':
+      id: 14
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 8
+        - 9
+        - 10
+        - 11
+        - 12
+        - 13
+        - 15
+    '15':
+      id: 15
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 8
+        - 9
+        - 10
+        - 11
+        - 12
+        - 13
+        - 14
+  global_chart_configuration:
+    scope:
+      rootPath:
+      - ROOT_ID
+      excluded: []
+    chartsInScope:
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+  native_filter_configuration:
+  - cascadeParentIds: []
+    controlValues:
+      creatable: false
+      defaultToFirstItem: false
+      enableEmptyFilter: false
+      inverseSelection: false
+      multiSelect: true
+      searchAllOptions: false
+    defaultDataMask:
+      extraFormData: {}
+      filterState: {}
+      ownState: {}
+    description: ''
+    filterType: filter_select
+    id: NATIVE_FILTER-2UAG67GwbLjiZgBcLaOZx
+    name: Department
+    requiredFirst:
+      nativeEvent:
+        isTrusted: true
+      target:
+        checked: false
+        className: ant-wave-target css-14vilre
+        disabled: false
+        id: filters_NATIVE_FILTER-2UAG67GwbLjiZgBcLaOZx_controlValues_defaultToFirstItem
+        prefixCls: ant-checkbox
+        type: checkbox
+    scope:
+      excluded:
+      - 14
+      - 10
+      rootPath:
+      - ROOT_ID
+    sortMetric: null
+    targets:
+    - column:
+        name: department_name
+      datasetUuid: 67b5ec46-2c51-464b-9f3c-3207ecc0c71d
+    type: NATIVE_FILTER
+    chartsInScope:
+    - 12
+    - 13
+    - 15
+    - 8
+    - 9
+    - 11
+    tabsInScope: []
+  chart_customization_config: []
+  map_label_colors:
+    attendance_rate: '#1FA8C9'
+    late_rate: '#1FA8C9'
+    attendance_rate_3m: '#1FA8C9'
+    Approved leave days: '#1FA8C9'
+    Leave starts: '#1FA8C9'
+    Not checkable: '#1FA8C9'
+    Contradicted: '#454E7C'
+    Confirmed: '#5AC189'
+  color_scheme: ''
+  refresh_frequency: 0
+  color_scheme_domain: []
+  expanded_slices: {}
+  label_colors: {}
+  shared_label_colors:
+  - attendance_rate
+  - late_rate
+  timed_refresh_immune_slices: []
+  cross_filters_enabled: true
+  default_filters: '{}'
+theme_uuid: null
+version: 1.0.0
