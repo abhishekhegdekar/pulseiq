@@ -4,7 +4,7 @@
 from `dim_employee` at the end of every load (`python -m pulseiq.load`).
 
 ## Rules
-- Month ends come from `dim_date` (`is_month_end = 'Y'`) up to REPORTING_DATE.
+- Month ends come from `dim_date` (`is_month_end = 'Y'`) up to DEMO_TODAY.
 - Employed at a month end: `hire_date <= month end` and (`exit_date` empty or `exit_date > month end`).
   A person who leaves on the last day of a month is NOT counted that month.
 - Department and role: the latest `dim_employee` version with `valid_from <= month end` (as-of rule).

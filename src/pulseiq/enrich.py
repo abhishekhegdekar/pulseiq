@@ -1,6 +1,6 @@
 """Helper columns (year, month, tenure), added to rows that passed validation.
 
-Tenure is measured to the exit date, or to the fixed REPORTING_DATE for people still
+Tenure is measured to the exit date, or to the fixed DEMO_TODAY for people still
 employed. It never uses today's date, so the same input always gives the same output.
 """
 import pandas as pd

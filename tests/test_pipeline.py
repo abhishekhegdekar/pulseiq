@@ -333,7 +333,7 @@ def write_workbook(path, **overrides):
 @pytest.fixture
 def env(tmp_path, monkeypatch):
     monkeypatch.setenv("INPUT_WORKBOOK", str(tmp_path / "in.xlsx"))
-    monkeypatch.setenv("REPORTING_DATE", "2026-09-30")
+    monkeypatch.setenv("DEMO_TODAY", "2026-09-30")
     monkeypatch.setenv("ALLOW_REJECTS", "false")
     monkeypatch.setenv("DATA_DIR", str(tmp_path / "data"))
     monkeypatch.setenv("LOG_DIR", str(tmp_path / "logs"))
@@ -404,7 +404,7 @@ def test_missing_column_is_a_structural_failure_with_exit_code_2(env):
 
 def test_bad_reporting_date_is_a_config_failure_with_exit_code_2(env, monkeypatch):
     write_workbook(env / "in.xlsx")
-    monkeypatch.setenv("REPORTING_DATE", "30-09-2026")
+    monkeypatch.setenv("DEMO_TODAY", "30-09-2026")
     assert main() == 2
 
 

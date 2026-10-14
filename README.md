@@ -74,7 +74,7 @@ A failed run can never replace good output. Full rules and reasoning: [docs/clea
 | Variable | Meaning |
 |---|---|
 | `INPUT_WORKBOOK` | Path to the workbook (inside the container: `data/raw/...`) |
-| `REPORTING_DATE` | Fixed date used for tenure and date checks (`2026-09-30`). Never "today" |
+| `DEMO_TODAY` | Fixed date used for tenure and date checks (`2026-09-30`). Never "today" |
 | `ALLOW_REJECTS` | `false` (default): any rejected row fails the run. `true`: publish valid rows, still save rejects |
 
 ## Repeatability
@@ -186,7 +186,7 @@ Everything other teams need is in this repository. Nothing is sent anywhere else
 
 - Work was committed straight to `main` in Phase 1, so there are no pull-request links. Later phases will use pull requests from branches.
 - The warehouse database is `pulseiq` (tables in the default schema, dashboard views in the `reporting` schema), not `pulseiq_wh` with schema `dw`. Table names follow our own design, for example `fact_attendance_monthly` where the reference sheet says `fact_attendance_monthly`.
-- The fixed "today" for tenure and ageing is set with `REPORTING_DATE=2026-09-30`, which does the job of `DEMO_TODAY`.
+- The fixed "today" for tenure and ageing is set with `DEMO_TODAY=2026-09-30`, which does the job of `DEMO_TODAY`.
 - Superset's admin password and secret key come from `.env`, not from the guide's local defaults.
 - Dashboard colours are Superset's defaults, with vermillion for leavers. The guide's navy, blue and orange palette is not applied yet.
 - The weekday view shows the weekday a leave starts, because attendance data is monthly and has no daily rows.

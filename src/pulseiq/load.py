@@ -215,11 +215,11 @@ def main() -> int:
         for needed in (schema_file, views_file, attendance_sql):
             if not needed.exists():
                 raise ConfigError(f"SQL file not found: {needed}")
-        raw_date = _require("REPORTING_DATE")
+        raw_date = _require("DEMO_TODAY")
         try:
             reporting_date = date.fromisoformat(raw_date)
         except ValueError:
-            raise ConfigError(f"REPORTING_DATE must be YYYY-MM-DD, got {raw_date!r}") from None
+            raise ConfigError(f"DEMO_TODAY must be YYYY-MM-DD, got {raw_date!r}") from None
         workbook = Path(os.environ.get("INPUT_WORKBOOK", ""))
         if not workbook.is_file():
             log.warning("INPUT_WORKBOOK not found: anomaly flags are not loaded")

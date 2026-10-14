@@ -45,7 +45,7 @@ Rejecting keeps the evidence, tells HR exactly which record to correct at the so
 In the supplied workbook this never occurs (0 rows), so it is covered by automated tests with a deliberately broken row. The closest real cases are the 2 leave requests that end before they start.
 
 ## G. Fixed reporting date
-Tenure and the "date after reporting date" check use `REPORTING_DATE` (30 Sep 2026, the workbook cut-off), never today's date. Same input therefore gives the same output on any day.
+Tenure and the "date after reporting date" check use `DEMO_TODAY` (30 Sep 2026, the workbook cut-off), never today's date. Same input therefore gives the same output on any day.
 
 ## Publication policy
 | Outcome | Exit code | `data/clean/` | `data/rejected/` | Run log |
