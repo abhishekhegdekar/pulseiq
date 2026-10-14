@@ -168,3 +168,26 @@ Decisions for the dashboard:
 - The weekday chart shows the weekday a leave starts, because the data is monthly and has no daily attendance.
 - The leave charts are company-wide, so the Department filter does not apply to them.
 - Loading `fact_anomaly_attendance` needs the workbook (`INPUT_WORKBOOK`); without it the loader warns and skips the flags.
+
+## Handoff package
+
+Everything other teams need is in this repository. Nothing is sent anywhere else.
+
+| Item | Where |
+|---|---|
+| Metric dictionary (M01 to M15 so far) | [docs/metric-dictionary.md](docs/metric-dictionary.md) |
+| Warehouse schema, grain of each fact, keys | [docs/warehouse-schema.md](docs/warehouse-schema.md), diagram in [docs/schema_diagram.png](docs/schema_diagram.png) |
+| Dashboard exports (import into Superset) | [dashboards/headcount.zip](dashboards/headcount.zip), [dashboards/attendance.zip](dashboards/attendance.zip); the same files unzipped are in `dashboards/headcount_departments/` and `dashboards/attendance_leave/` |
+| Attendance insight note | [reports/insights-attendance.md](reports/insights-attendance.md) |
+| Dashboard design notes | [docs/design-notes.md](docs/design-notes.md) |
+| Phase 1 review | [reports/phase-1-review.md](reports/phase-1-review.md) |
+
+## Assumptions
+
+- Work was committed straight to `main` in Phase 1, so there are no pull-request links. Later phases will use pull requests from branches.
+- The warehouse database is `pulseiq` (tables in the default schema, dashboard views in the `reporting` schema), not `pulseiq_wh` with schema `dw`. Table names follow our own design, for example `fact_attendance` where the reference sheet says `fact_attendance_monthly`.
+- The fixed "today" for tenure and ageing is set with `REPORTING_DATE=2026-09-30`, which does the job of `DEMO_TODAY`.
+- Superset's admin password and secret key come from `.env`, not from the guide's local defaults.
+- Dashboard colours are Superset's defaults, with vermillion for leavers. The guide's navy, blue and orange palette is not applied yet.
+- The weekday view shows the weekday a leave starts, because attendance data is monthly and has no daily rows.
+- AI/ML anomaly flags are shown as a review list only, with each flag checked against our monthly data. They feed no metric.
