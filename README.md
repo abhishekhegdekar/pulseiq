@@ -86,13 +86,13 @@ src/pulseiq/   config, errors, extract, transform, validate, enrich, publish, ru
 tests/         pytest suite (valid, invalid and repeated runs)
 data/          raw/ (input, read-only in Docker), clean/, rejected/   (git-ignored)
 logs/          runs.jsonl                                              (git-ignored)
-docs/          metric_dictionary.md, cleaning_rules.md
+docs/          metric-dictionary.md, cleaning_rules.md
 sql/           warehouse SQL (Task 2)
 dashboards/    exported dashboards (Tasks 3 and 4)
 ```
 
 ## Documentation
-- [Metric dictionary](docs/metric_dictionary.md): Headcount, Payroll cost, Attendance rate, Leave without pay days, Average tenure
+- [Metric dictionary](docs/metric-dictionary.md): Headcount, Payroll cost, Attendance rate, Leave without pay days, Average tenure
 - [Cleaning, validation and publication rules](docs/cleaning_rules.md), including the joining-after-leaving decision
 
 ## Known limitations and open items
@@ -118,16 +118,16 @@ Loading twice changes nothing (0 inserted, 0 updated).
 ## Warehouse
 
 - Schema: `sql/01_schema.sql`; diagram: `docs/schema_diagram.png`
-- Design and grains: `docs/warehouse_design.md`
+- Design and grains: `docs/warehouse-schema.md`
 - Keys, SCD2 and the department-transfer rule: `docs/scd2_keys_and_transfers.md`
 - Headcount rules and validation: `docs/headcount_validation.md`
 - Answers: `sql/q1..q4_*.sql`
 - Dashboard style guide: docs/style_guide.md
-- Dashboard design review and definitions: docs/dashboard_design_review.md
+- Dashboard design review and definitions: docs/design-notes.md
 
 ## Task 3: Headcount & Departments dashboard
 
-- Style guide: docs/style_guide.md. Layout review: docs/dashboard_design_review.md.
+- Style guide: docs/style_guide.md. Layout review: docs/design-notes.md.
 - Superset runs in Docker Compose (`docker compose up -d superset`, then http://localhost:8088).
 - The dashboard reads only the `reporting` views (sql/02_reporting_views.sql) through the read-only login `superset_ro` (sql/10_readonly_role.sql). It never sees names, dates of birth or payroll.
 - Charts: Headcount, Average tenure, Headcount trend, Joiners vs leavers, Headcount by department, by tenure band and by job level, plus key takeaways. Filters: Department and Date range.
@@ -136,7 +136,7 @@ Loading twice changes nothing (0 inserted, 0 updated).
 
 ## Task 4: Attendance analysis
 
-Definitions: [docs/attendance_definitions.md](docs/attendance_definitions.md). Findings: [docs/attendance_note.md](docs/attendance_note.md) (insight note with three findings, limits and the December answer).
+Definitions: [docs/attendance_definitions.md](docs/attendance_definitions.md). Findings: [reports/insights-attendance.md](reports/insights-attendance.md) (insight note with three findings, limits and the December answer).
 
 Run each from the project folder (the `--build` flag makes Docker use the latest code):
 

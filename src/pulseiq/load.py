@@ -113,7 +113,7 @@ def upsert_table(cur, table: str, key: list[str], df: pd.DataFrame) -> dict:
             "unchanged": len(df) - len(flags), "not_in_source": not_in_source}
 
 
-# One row per employee per month-end while employed. Rules (docs/warehouse_design.md):
+# One row per employee per month-end while employed. Rules (docs/warehouse-schema.md):
 #  - employed at month end: hire_date <= month end and (no exit_date or exit_date > month end)
 #  - department/role come from the latest version with valid_from <= month end (as-of rule)
 HEADCOUNT_SQL = """

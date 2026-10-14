@@ -9,7 +9,7 @@ simplest option and add the rule.
 
 - Title format: `<metric id> <metric dictionary name> - <slice>, <period>`
   e.g. `M01 Headcount - by department, 30 Sep 2026`. Use the exact name from `metric_dictionary`, so
-  every number can be traced to its definition (`docs/metric_dictionary.md`).
+  every number can be traced to its definition (`docs/metric-dictionary.md`).
 - Takeaway: one sentence, at most about 120 characters, with at least one number and a verb.
   e.g. `Engineering holds 167 of 441 people (38%); Executive Office has 1.`
 - If the takeaway is no longer true after a data refresh, it must be regenerated (see Task 3 checks).
