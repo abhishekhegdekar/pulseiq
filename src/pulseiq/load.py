@@ -159,8 +159,23 @@ def build_headcount(cur, reporting_date: date) -> dict:
             "unchanged": built - len(flags), "not_in_source": 0, "deleted": deleted}
 
 
+ANOMALY_SOURCE = "attendance_monthly_features"
+ANOMALY_COLUMNS = ["result_id", "record_id", "employee_id", "period_end_date", "anomaly_score", "flagged",
+                   "reason_code", "reason_text", "model_version", "scored_date"]
+
+
+def anomaly_frame(workbook: Path) -> pd.DataFrame:
+    """Attendance rows of the AI/ML team's sheet fact_anomaly, shaped for fact_anomaly_attendance."""
+    a = pd.read_excel(workbook, sheet_name="fact_anomaly")
+    a = a[a["source_dataset"] == ANOMALY_SOURCE].copy()
+    a["period_end_date"] = pd.to_datetime(a["period"]) + pd.offsets.MonthEnd(0)
+    a["scored_date"] = pd.to_datetime(a["scored_at"]).dt.normalize()
+    return a[ANOMALY_COLUMNS].reset_index(drop=True)
+
+
 def load_all(clean_dir: Path, schema_file: Path, settings: dict, reporting_date: date,
-             views_file: Path | None = None) -> dict:
+             views_file: Path | None = None, attendance_sql: Path | None = None,
+             anomaly_workbook: Path | None = None) -> dict:
     frames = {}
     for name, _, _ in LOAD_ORDER:
         path = clean_dir / f"{name}.parquet"
@@ -174,9 +189,15 @@ def load_all(clean_dir: Path, schema_file: Path, settings: dict, reporting_date:
             cur.execute(schema_file.read_text(encoding="utf-8"))   # idempotent
             if views_file is not None:                             # dashboard views, also idempotent
                 cur.execute(views_file.read_text(encoding="utf-8"))
+            if attendance_sql is not None:                         # anomaly table + attendance views
+                cur.execute(attendance_sql.read_text(encoding="utf-8"))
             for name, table, key in LOAD_ORDER:
                 results[table] = upsert_table(cur, table, key, frames[name])
                 log.info("Loaded %-22s %s", table, results[table])
+            if anomaly_workbook is not None:
+                results["fact_anomaly_attendance"] = upsert_table(
+                    cur, "fact_anomaly_attendance", ["result_id"], anomaly_frame(anomaly_workbook))
+                log.info("Loaded %-22s %s", "fact_anomaly_attendance", results["fact_anomaly_attendance"])
             results["fact_headcount_monthly"] = build_headcount(cur, reporting_date)
             log.info("Built  %-22s %s", "fact_headcount_monthly", results["fact_headcount_monthly"])
     return results
@@ -190,7 +211,8 @@ def main() -> int:
         data_dir = Path(os.environ.get("DATA_DIR", "data"))
         schema_file = Path(os.environ.get("SCHEMA_FILE", "sql/01_schema.sql"))
         views_file = Path(os.environ.get("VIEWS_FILE", "sql/02_reporting_views.sql"))
-        for needed in (schema_file, views_file):
+        attendance_sql = Path(os.environ.get("ATTENDANCE_SQL_FILE", "sql/03_attendance_reporting.sql"))
+        for needed in (schema_file, views_file, attendance_sql):
             if not needed.exists():
                 raise ConfigError(f"SQL file not found: {needed}")
         raw_date = _require("REPORTING_DATE")
@@ -198,7 +220,12 @@ def main() -> int:
             reporting_date = date.fromisoformat(raw_date)
         except ValueError:
             raise ConfigError(f"REPORTING_DATE must be YYYY-MM-DD, got {raw_date!r}") from None
-        results = load_all(data_dir / "clean", schema_file, settings, reporting_date, views_file)
+        workbook = Path(os.environ.get("INPUT_WORKBOOK", ""))
+        if not workbook.is_file():
+            log.warning("INPUT_WORKBOOK not found: anomaly flags are not loaded")
+            workbook = None
+        results = load_all(data_dir / "clean", schema_file, settings, reporting_date, views_file,
+                           attendance_sql, workbook)
     except PulseIQError as exc:
         log.error("STATUS=FAILED_CONFIG: %s", exc)
         return 2
