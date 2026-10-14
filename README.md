@@ -7,7 +7,7 @@ Workforce analytics pipeline, warehouse and dashboards for the fictional company
 - [x] Task 1: ETL pipeline (extract, transform, validate, publish, run log, tests, metric dictionary)
 - [x] Task 2: Analytics warehouse
 - [x] Task 3: Headcount & Departments dashboard
-- [x] Task 4: Attendance analysis
+- [x] Task 4: Attendance trends analysis and Attendance & Leave dashboard
 
 ## Quick start
 Requirements: Docker Desktop (tested with Docker 29.8 and Compose v5).
@@ -124,7 +124,7 @@ Loading twice changes nothing (0 inserted, 0 updated).
 
 ## Task 4: Attendance analysis
 
-Definitions: [docs/attendance_definitions.md](docs/attendance_definitions.md). Findings: [docs/attendance_note.md](docs/attendance_note.md) (one page).
+Definitions: [docs/attendance_definitions.md](docs/attendance_definitions.md). Findings: [docs/attendance_note.md](docs/attendance_note.md) (insight note with three findings, limits and the December answer).
 
 Run each from the project folder (the `--build` flag makes Docker use the latest code):
 
@@ -141,3 +141,18 @@ Decisions:
 - Only Approved leave counts as leave taken. Leave running past September 2026 is cut off and pro-rated.
 - The anomaly flags are a review list only. They join on employee and month; 55 of 221 attendance flags are contradicted by our data. They feed no metric.
 - Finance & Accounts has the lowest rate because of two long maternity leaves, not poor attendance.
+
+### Task 4 dashboard and number checks
+
+The **Attendance & Leave** dashboard (8 charts, a Department filter and a takeaway under each row) is exported to [dashboards/attendance_leave/](dashboards/attendance_leave/); see [dashboards/README.md](dashboards/README.md) to restore it. Superset reads only the `reporting` views in `sql/03_attendance_reporting.sql`, which hold aggregates and no employee IDs. The AI/ML flags are loaded into `fact_anomaly_attendance` (warehouse schema, employee IDs, not readable by `superset_ro`).
+
+| Command | What it does |
+|---|---|
+| `docker compose run --rm --build load python -m pulseiq.check_attendance_reporting` | Compares every reporting view with the pandas calculations, checks B1 to B6 (`STATUS=ALL_MATCH`) |
+| `docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < sql/q6_attendance_dashboard_numbers.sql` | Reproduces every figure shown on the dashboard from the views |
+
+Decisions for the dashboard:
+- The Executive Office (1 person) and any group under 5 employees are left out of every view.
+- The weekday chart shows the weekday a leave starts, because the data is monthly and has no daily attendance.
+- The leave charts are company-wide, so the Department filter does not apply to them.
+- Loading `fact_anomaly_attendance` needs the workbook (`INPUT_WORKBOOK`); without it the loader warns and skips the flags.
