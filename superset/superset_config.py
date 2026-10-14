@@ -18,3 +18,15 @@ DATA_CACHE_CONFIG = CACHE_CONFIG
 
 # The page is only reachable from this computer over plain HTTP (127.0.0.1:8088).
 TALISMAN_ENABLED = False
+
+# PulseIQ palette (guide section 6): blue, orange, navy, green, grey.
+# Blue and orange are the good-versus-bad pair (colour-blind safe).
+EXTRA_CATEGORICAL_COLOR_SCHEMES = [
+    {
+        "id": "pulseiq",
+        "description": "PulseIQ dashboard palette",
+        "label": "PulseIQ",
+        "isDefault": True,
+        "colors": ["#2E75B6", "#C55A11", "#1F3864", "#548235", "#7F7F7F"],
+    }
+]
