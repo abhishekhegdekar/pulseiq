@@ -1,6 +1,6 @@
 import pandas as pd
 
-from pulseiq.check_attendance_reporting import expected_flags, expected_leave, expected_monthly
+from pulseiq.check_attendance_reporting import expected_flags, expected_leave, expected_monthly, expected_rolling
 from pulseiq.load import ANOMALY_COLUMNS, anomaly_frame
 
 
@@ -45,3 +45,10 @@ def test_anomaly_frame_keeps_attendance_rows_and_month_end(tmp_path):
     out = anomaly_frame(path)
     assert list(out.columns) == ANOMALY_COLUMNS and len(out) == 1
     assert out.period_end_date.iloc[0] == pd.Timestamp("2026-01-31")
+
+
+def test_expected_rolling_pools_three_consecutive_months_only():
+    rows = _att("A", 5, "2026-01-31") + _att("A", 5, "2026-02-28") + _att("A", 5, "2026-03-31") + _att("A", 5, "2026-05-31")
+    out = expected_rolling(pd.DataFrame(rows))
+    assert list(out.month_end_date) == [pd.Timestamp("2026-03-31").date()]
+    assert out.r_present_days.iloc[0] == 3 * 5 * 19

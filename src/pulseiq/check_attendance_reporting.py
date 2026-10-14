@@ -14,7 +14,7 @@ import pandas as pd
 import psycopg
 
 from pulseiq.anomaly_review import join_flags, load_flags, supported
-from pulseiq.attendance import MIN_GROUP, SUM_COLS, split_after_exit, summarise
+from pulseiq.attendance import MIN_GROUP, SUM_COLS, rolling_3_month, split_after_exit, summarise
 from pulseiq.check_reporting import _q, diff
 from pulseiq.errors import ConfigError, PulseIQError
 from pulseiq.leave_analysis import approved, start_weekday
@@ -28,6 +28,13 @@ def expected_monthly(att: pd.DataFrame) -> pd.DataFrame:
     t = summarise(att, ["department_id", "period_end_date"])
     t = t[t.employees >= MIN_GROUP]
     return t.assign(month_end_date=t.period_end_date.dt.date)[["month_end_date", "department_id", "employees", *SUM_COLS]]
+
+
+def expected_rolling(att: pd.DataFrame) -> pd.DataFrame:
+    r = rolling_3_month(att).dropna(subset=SUM_COLS)
+    r = r[r.employees >= MIN_GROUP]
+    r = r.assign(month_end_date=r.period_end_date.dt.date).rename(columns={c: f"r_{c}" for c in SUM_COLS})
+    return r[["month_end_date", "department_id", *[f"r_{c}" for c in SUM_COLS]]]
 
 
 def expected_leave(lv: pd.DataFrame, window_end: pd.Timestamp) -> pd.DataFrame:
@@ -73,6 +80,7 @@ def main() -> int:
             lt = _q(cur, "SELECT * FROM reporting.leave_by_type")
             wd = _q(cur, "SELECT * FROM reporting.leave_start_weekday")
             fm = _q(cur, "SELECT * FROM reporting.attendance_flags_monthly")
+            rl = _q(cur, "SELECT * FROM reporting.attendance_rolling_3m")
             n_flags = _q(cur, "SELECT count(*) AS n FROM fact_anomaly_attendance").n[0]
     except PulseIQError as exc:
         log.error("STATUS=FAILED_CONFIG: %s", exc)
@@ -107,6 +115,10 @@ def main() -> int:
         p5.append(f"flags in the warehouse={n_flags} sheet={len(flags)}")
     checks["B5 anomaly flags by reason and check result"] = p5
 
+    rcols = [f"r_{c}" for c in SUM_COLS]
+    checks["B6 pooled rolling 3 months by department"] = diff(
+        rl, expected_rolling(att), ["month_end_date", "department_id"], rcols)
+
     failed = 0
     for label, problems in checks.items():
         if problems:
@@ -114,7 +126,7 @@ def main() -> int:
             log.error("MISMATCH  %s\n  %s", label, "\n  ".join(problems[:10]))
         else:
             log.info("MATCH     %s", label)
-    log.info("Rows: attendance_monthly=%d, leave_by_type=%d, flags=%d", len(am), len(lt), int(fm.flagged_employee_months.sum()))
+    log.info("Rows: attendance_monthly=%d, rolling_3m=%d, leave_by_type=%d, flags=%d", len(am), len(rl), len(lt), int(fm.flagged_employee_months.sum()))
     log.info("STATUS=%s", "ALL_MATCH" if not failed else f"{failed}_MISMATCH")
     return 1 if failed else 0
 

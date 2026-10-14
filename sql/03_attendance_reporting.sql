@@ -107,3 +107,27 @@ WHERE f.flagged = 'Y'
   AND EXISTS (SELECT 1 FROM reporting.attendance_monthly m
               WHERE m.month_end_date = f.period_end_date AND m.department_id = a.department_id)
 GROUP BY 1, 2, 3, 4, 5, 6;
+
+-- Pooled rolling 3 months per department: the day counts of the month and the two before it, added up.
+-- Dashboards compute the rate as SUM(numerator) / SUM(denominator) over these r_ columns, so the 3-month
+-- figure is pooled, not an average of three monthly rates. Needs three consecutive months of data.
+CREATE OR REPLACE VIEW reporting.attendance_rolling_3m AS
+SELECT month_end_date, year_month, department_id, department_name, employees,
+       r_scheduled_days, r_present_days, r_wfh_days, r_half_days_unpaid,
+       r_paid_leave_days, r_unpaid_absence_days, r_late_arrivals
+FROM (
+    SELECT m.*,
+           sum(scheduled_days)      OVER w AS r_scheduled_days,
+           sum(present_days)        OVER w AS r_present_days,
+           sum(wfh_days)            OVER w AS r_wfh_days,
+           sum(half_days_unpaid)    OVER w AS r_half_days_unpaid,
+           sum(paid_leave_days)     OVER w AS r_paid_leave_days,
+           sum(unpaid_absence_days) OVER w AS r_unpaid_absence_days,
+           sum(late_arrivals)       OVER w AS r_late_arrivals,
+           count(*)                 OVER w AS n_months,
+           min(month_end_date)      OVER w AS first_month
+    FROM reporting.attendance_monthly m
+    WINDOW w AS (PARTITION BY department_id ORDER BY month_end_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)
+) s
+WHERE n_months = 3
+  AND first_month = (date_trunc('month', month_end_date) - interval '2 months' + interval '1 month - 1 day')::date;
