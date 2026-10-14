@@ -115,7 +115,7 @@ Loading twice changes nothing (0 inserted, 0 updated).
 
 ## Task 3: Headcount & Departments dashboard
 
-- Style guide: docs/style_guide.md. Layout review: docs/dashboard_review.md.
+- Style guide: docs/style_guide.md. Layout review: docs/dashboard_design_review.md.
 - Superset runs in Docker Compose (`docker compose up -d superset`, then http://localhost:8088).
 - The dashboard reads only the `reporting` views (sql/02_reporting_views.sql) through the read-only login `superset_ro` (sql/10_readonly_role.sql). It never sees names, dates of birth or payroll.
 - Charts: Headcount, Average tenure, Headcount trend, Joiners vs leavers, Headcount by department, by tenure band and by job level, plus key takeaways. Filters: Department and Date range.
