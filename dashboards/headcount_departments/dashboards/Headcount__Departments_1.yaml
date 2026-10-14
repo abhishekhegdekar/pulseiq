@@ -1,9 +1,9 @@
 dashboard_title: Headcount & Departments
 description: null
-css: ''
+css: null
 slug: null
-certified_by: ''
-certification_details: ''
+certified_by: null
+certification_details: null
 published: true
 uuid: 738536c2-e1a6-45af-ac6a-d1a06aebf6a9
 position:
@@ -195,14 +195,8 @@ position:
     - GRID_ID
     type: ROW
 metadata:
-  color_scheme_domain: []
-  shared_label_colors:
-  - count
-  map_label_colors:
-    count: '#1FA8C9'
-    Joiners: '#1FA8C9'
-    Leavers: '#454E7C'
-  label_colors: {}
+  label_colors:
+    Leavers: '#D55E00'
   chart_configuration:
     '3':
       id: 3
@@ -337,5 +331,10 @@ metadata:
   timed_refresh_immune_slices: []
   cross_filters_enabled: true
   default_filters: '{}'
+  show_chart_timestamps: false
+  shared_label_colors:
+  - count
+  map_label_colors: {}
+  color_scheme_domain: []
 theme_uuid: null
 version: 1.0.0

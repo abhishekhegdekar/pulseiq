@@ -131,6 +131,7 @@ position:
     - ROW-sg0TRvTKz_gfr-CjEirbM
     - ROW-VHmj7bu4z2HkAyyqrsgOb
     - ROW-urnlFCmHhBs3xZpx4Teqj
+    - ROW-N-UQAKH8YY
     id: GRID_ID
     parents:
     - ROOT_ID
@@ -319,6 +320,61 @@ position:
     - ROOT_ID
     - GRID_ID
     type: ROW
+  ROW-N-UQAKH8YY:
+    children:
+    - CHART-WMINBMEC
+    - CHART-HPI0VA33
+    - CHART-8C3LL5M0
+    id: ROW-N-UQAKH8YY
+    meta:
+      '0': ROOT_ID
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+    parents:
+    - ROOT_ID
+    - GRID_ID
+  CHART-WMINBMEC:
+    children: []
+    id: CHART-WMINBMEC
+    meta:
+      chartId: 7
+      height: 50
+      sliceName: Joiners vs leavers
+      uuid: ca0786cd-e008-45c2-94aa-12f9f4a7c2e4
+      width: 4
+    type: CHART
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-N-UQAKH8YY
+  CHART-HPI0VA33:
+    children: []
+    id: CHART-HPI0VA33
+    meta:
+      chartId: 4
+      height: 50
+      sliceName: Headcount by tenure band
+      uuid: c6a495dc-5285-445c-9eb8-d781949a69d4
+      width: 4
+    type: CHART
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-N-UQAKH8YY
+  CHART-8C3LL5M0:
+    children: []
+    id: CHART-8C3LL5M0
+    meta:
+      chartId: 6
+      height: 50
+      sliceName: Headcount trend
+      uuid: ce640f43-ec28-49fd-ad16-12dd8873fd8d
+      width: 4
+    type: CHART
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-N-UQAKH8YY
 metadata:
   chart_configuration:
     '8':
