@@ -1,5 +1,5 @@
 database_name: PulseIQ Warehouse
-sqlalchemy_uri: postgresql+psycopg2://superset_ro:XXXXXXXXXX@db:5432/pulseiq
+sqlalchemy_uri: postgresql+psycopg2://superset_ro:XXXXXXXXXX@db:5432/pulseiq_wh
 cache_timeout: null
 expose_in_sqllab: true
 allow_run_async: false

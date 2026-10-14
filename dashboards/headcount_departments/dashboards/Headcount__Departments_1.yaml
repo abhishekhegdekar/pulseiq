@@ -196,7 +196,9 @@ position:
     type: ROW
 metadata:
   label_colors:
-    Leavers: '#D55E00'
+    Joiners: '#2E75B6'
+    Leavers: '#C55A11'
+    COUNT(*): '#2E75B6'
   chart_configuration:
     '3':
       id: 3
@@ -325,7 +327,7 @@ metadata:
     - 7
     tabsInScope: []
   chart_customization_config: []
-  color_scheme: ''
+  color_scheme: pulseiq
   refresh_frequency: 0
   expanded_slices: {}
   timed_refresh_immune_slices: []
@@ -335,6 +337,11 @@ metadata:
   shared_label_colors:
   - count
   map_label_colors: {}
-  color_scheme_domain: []
+  color_scheme_domain:
+  - '#2E75B6'
+  - '#C55A11'
+  - '#1F3864'
+  - '#548235'
+  - '#7F7F7F'
 theme_uuid: null
 version: 1.0.0
