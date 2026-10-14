@@ -9,6 +9,18 @@ Workforce analytics pipeline, warehouse and dashboards for the fictional company
 - [x] Task 3: Headcount & Departments dashboard
 - [x] Task 4: Attendance trends analysis and Attendance & Leave dashboard
 
+## What it looks like
+
+Two Superset dashboards read the warehouse's `reporting` views (aggregates only, no employee IDs). All data is fictional and synthetic.
+
+**Headcount & Departments:** headcount and tenure, joiners vs leavers, department and level mix, with a Department filter.
+
+![Headcount & Departments dashboard](docs/img/headcount.jpg)
+
+**Attendance & Leave:** attendance and late-arrival trends by month and department, leave by type, leave starts by weekday, and the AI/ML anomaly flags checked against our monthly data. Each row has a one-line takeaway, and the header note states the limits.
+
+![Attendance & Leave dashboard](docs/img/attendance.jpg)
+
 ## Quick start
 Requirements: Docker Desktop (tested with Docker 29.8 and Compose v5).
 
@@ -76,7 +88,7 @@ data/          raw/ (input, read-only in Docker), clean/, rejected/   (git-ignor
 logs/          runs.jsonl                                              (git-ignored)
 docs/          metric_dictionary.md, cleaning_rules.md
 sql/           warehouse SQL (Task 2)
-dashboards/    exported dashboards (Task 3)
+dashboards/    exported dashboards (Tasks 3 and 4)
 ```
 
 ## Documentation
