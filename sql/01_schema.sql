@@ -1,6 +1,13 @@
 -- PulseIQ warehouse schema (star schema). Safe to re-run: every statement is IF NOT EXISTS.
 -- Load order: dim_department, dim_leave_type, dim_date, dim_role, dim_employee, then facts.
 
+-- Warehouse tables live in schema dw (views for dashboards live in schema reporting).
+CREATE SCHEMA IF NOT EXISTS dw;
+DO $$ BEGIN
+    EXECUTE format('ALTER DATABASE %I SET search_path = dw, public', current_database());
+END $$;
+SET search_path = dw, public;
+
 -- ---------- Dimensions ----------
 CREATE TABLE IF NOT EXISTS dim_department (
     department_id   text PRIMARY KEY,

@@ -67,13 +67,14 @@ def _db_settings() -> dict:
         dbname=parsed.path.lstrip("/"),
         user=unquote(parsed.username),
         password=unquote(parsed.password or ""),
+        options="-c search_path=dw,public",
     )
 
 
 def _table_columns(cur, table: str) -> list[str]:
     cur.execute(
         "SELECT column_name FROM information_schema.columns "
-        "WHERE table_schema = 'public' AND table_name = %s ORDER BY ordinal_position",
+        "WHERE table_schema = 'dw' AND table_name = %s ORDER BY ordinal_position",
         (table,))
     return [r[0] for r in cur.fetchall()]
 
