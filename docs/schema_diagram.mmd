@@ -3,11 +3,11 @@ erDiagram
     dim_department ||--o{ dim_employee : "  "
     dim_role ||--o{ dim_employee : "  "
     dim_employee ||--o{ fact_payroll : "  "
-    dim_employee ||--o{ fact_attendance : "  "
+    dim_employee ||--o{ fact_attendance_monthly : "  "
     dim_employee ||--o{ fact_leave : "  "
     dim_employee ||--o{ fact_headcount_monthly : "  "
     dim_date ||--o{ fact_payroll : "  "
-    dim_date ||--o{ fact_attendance : "  "
+    dim_date ||--o{ fact_attendance_monthly : "  "
     dim_date ||--o{ fact_leave : "  "
     dim_leave_type ||--o{ fact_leave : "  "
 
@@ -46,7 +46,7 @@ erDiagram
         text role_id "copy"
         numeric employer_cost
     }
-    fact_attendance {
+    fact_attendance_monthly {
         int employee_key PK, FK "GRAIN employee version x month"
         int date_key PK, FK
         text department_id "copy"
