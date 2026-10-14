@@ -6,7 +6,7 @@ Workforce analytics pipeline, warehouse and dashboards for the fictional company
 ## Status
 - [x] Task 1: ETL pipeline (extract, transform, validate, publish, run log, tests, metric dictionary)
 - [x] Task 2: Analytics warehouse
-- [ ] Task 3: Headcount & Departments dashboard
+- [x] Task 3: Headcount & Departments dashboard
 - [ ] Task 4: Attendance analysis
 
 ## Quick start
@@ -112,3 +112,12 @@ Loading twice changes nothing (0 inserted, 0 updated).
 - Answers: `sql/q1..q4_*.sql`
 - Dashboard style guide: docs/style_guide.md
 - Dashboard design review and definitions: docs/dashboard_design_review.md
+
+## Task 3: Headcount & Departments dashboard
+
+- Style guide: docs/style_guide.md. Layout review: docs/dashboard_review.md.
+- Superset runs in Docker Compose (`docker compose up -d superset`, then http://localhost:8088).
+- The dashboard reads only the `reporting` views (sql/02_reporting_views.sql) through the read-only login `superset_ro` (sql/10_readonly_role.sql). It never sees names, dates of birth or payroll.
+- Charts: Headcount, Average tenure, Headcount trend, Joiners vs leavers, Headcount by department, by tenure band and by job level, plus key takeaways. Filters: Department and Date range.
+- Checks: `python -m pulseiq.check_reporting` (views vs pandas) and sql/q5_dashboard_numbers.sql (every dashboard number).
+- Export: dashboards/headcount_departments/ (no password stored). See dashboards/README.md to restore it.
