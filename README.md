@@ -184,10 +184,13 @@ Everything other teams need is in this repository. Nothing is sent anywhere else
 
 ## Assumptions
 
+Phase 1 now follows the guide's names: database `pulseiq_wh`, warehouse tables in schema `dw`,
+dashboard views in schema `reporting`, `fact_attendance_monthly`, `DEMO_TODAY`, `DATABASE_URL`,
+`ENV`, `SOURCE_MODE`, and the guide's colour palette. These are the differences that remain:
+
 - Work was committed straight to `main` in Phase 1, so there are no pull-request links. Later phases will use pull requests from branches.
-- The warehouse database is `pulseiq` (tables in the default schema, dashboard views in the `reporting` schema), not `pulseiq_wh` with schema `dw`. Table names follow our own design, for example `fact_attendance_monthly` where the reference sheet says `fact_attendance_monthly`.
-- The fixed "today" for tenure and ageing is set with `DEMO_TODAY=2026-09-30`, which does the job of `DEMO_TODAY`.
-- Superset's admin password and secret key come from `.env`, not from the guide's local defaults.
-- Dashboard colours are Superset's defaults, with vermillion for leavers. The guide's navy, blue and orange palette is not applied yet.
+- The Postgres login and the Superset admin login use passwords chosen in `.env`, not the guide's local demo values. The Superset secret key also comes from `.env`.
+- `SOURCE_MODE` accepts only `file` (the workbook) in Phase 1. `JWT_SECRET`, `JWT_ALGORITHM`, `BACKEND_BASE_URL` and `AI_BASE_URL` are not used yet and will be added with the API in a later phase.
+- Navy `#1F3864` is registered in the dashboard palette but not used in any chart, because it is nearly invisible on Superset's dark theme. Charts use blue, orange, green and grey, and every colour is backed by a label or legend word.
 - The weekday view shows the weekday a leave starts, because attendance data is monthly and has no daily rows.
-- AI/ML anomaly flags are shown as a review list only, with each flag checked against our monthly data. They feed no metric.
+- AI flags are shown as a review list only, with each flag checked against our monthly data. They feed no metric.
