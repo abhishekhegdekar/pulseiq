@@ -14,29 +14,37 @@ simplest option and add the rule.
   e.g. `Engineering holds 167 of 441 people (38%); Executive Office has 1.`
 - If the takeaway is no longer true after a data refresh, it must be regenerated (see Task 3 checks).
 
-## 2. Colour (colour-blind safe)
-Palette: Okabe-Ito (designed to be distinguishable with the common types of colour blindness).
-Contrast measured against white (WCAG: 3:1 for chart marks, 4.5:1 for text).
+## 2. Colour
+Palette: the PulseIQ guide palette, registered in Superset as the colour scheme "PulseIQ"
+(`superset/superset_config.py`). Contrast is measured against white (WCAG: 3:1 for chart marks,
+4.5:1 for text). Dashboards are also viewed on Superset's dark theme, where navy is almost invisible
+(1.6:1), so navy is kept for titles and print, not for chart marks.
 
 | Role | Colour | Contrast on white | Use |
 |---|---|---|---|
-| Primary data | `#0072B2` blue | 5.19 | single-series charts, KPI numbers, "the" measure |
-| Comparison B | `#D55E00` vermillion | 3.87 | the second series (e.g. leavers vs joiners) |
-| Category 3 | `#009E73` green | 3.42 | only when 3+ series are unavoidable |
-| Category 4 | `#CC79A7` purple | 3.06 | only when 4 series are unavoidable |
-| Context / others | `#7B8794` grey | 3.66 | everything that is not the point of the chart |
+| Primary data | `#2E75B6` blue | 4.84 | every single-series chart, KPI numbers, "the" measure |
+| Comparison B / "bad" | `#C55A11` orange | 4.33 | the second series (leavers vs joiners), contradicted AI flags |
+| Category 3 / "good" | `#548235` green | 4.54 | confirmed AI flags; only when 3+ series are unavoidable |
+| Context / others | `#7F7F7F` grey | 4.00 | not checkable AI flags, everything that is not the point |
+| Dark | `#1F3864` navy | 11.62 | titles and print; not used for chart marks on the dark theme |
 | Text | `#1F2933` | 14.76 | titles, labels |
 | Muted text | `#52606D` | 6.46 | takeaway line, axis labels, footnotes |
-| Text on blue marks | `#FFFFFF` | 5.19 | labels inside bars |
-| Text version of vermillion | `#A84800` | 5.85 | text only (never the light vermillion) |
+| Text on blue marks | `#FFFFFF` | 4.84 | labels inside bars |
+| Text version of orange | `#A84800` | 5.85 | text only (never the lighter orange) |
 | Gridlines | `#CBD2D9` | 1.53 | decorative only, thin |
 
+Series colours are fixed per dashboard in Properties, under `label_colors`, so a series never changes colour when
+a filter is applied.
+
 Rules:
-- Never use yellow `#F0E442` (1.3:1), orange `#E69F00` or sky blue `#56B4E9` (about 2.3:1) for marks on white.
-- **Never rely on colour alone.** Direct labels, legend order, line styles or position must also carry the meaning.
-- No red/green pairs. Joiners vs leavers is blue vs vermillion, with direct labels.
+- Never use yellow `#F0E442` (1.3:1) or sky blue `#56B4E9` (about 2.3:1) for marks on white.
+- **Never rely on colour alone.** Direct labels, legend words, order or position must also carry the meaning.
+- Blue and orange mean good and bad. No red/green pairs. Joiners vs leavers is blue vs orange, with direct labels.
+- The AI flag chart uses grey, orange and green. Orange and green have similar lightness, so people with red-green
+  colour blindness may confuse them. The legend words (Not checkable, Contradicted, Confirmed) and the fixed
+  stacking order carry the meaning.
 - Maximum 4 colours in one chart. With more than 4 groups (11 departments), use **one colour, sorted bars,
-  labelled**, and highlight at most one bar in blue while the rest are grey.
+  labelled**.
 - Ordered categories (tenure bands) use one colour and the axis order, not a colour ramp.
 - Background white (`#FFFFFF`) on cards, page background `#F5F7FA` (text contrast 13.75).
 

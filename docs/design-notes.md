@@ -6,7 +6,7 @@ Figures in the mockups are real warehouse numbers for 30 Sep 2026 and are re-ver
 
 ## What the AI draft did well
 - Header, 4 key numbers first, charts below, filters on the side, as asked.
-- Style-guide palette (blue / vermillion / grey), metric-dictionary titles, a takeaway under every title.
+- Style-guide palette (blue / orange / green / grey; navy for titles and print), metric-dictionary titles, a takeaway under every title.
 - Department split as sorted bars in one colour with one highlighted bar (no 11-colour chart).
 - Real `<label>`/`<select>` controls, 44 px targets, 12 px minimum text.
 
@@ -22,7 +22,7 @@ Figures in the mockups are real warehouse numbers for 30 Sep 2026 and are re-ver
 | 6 | "Role mix" as job title has 57 values: unreadable | Keep job level | Role mix = headcount by job level L1 to L7; job titles stay available in the data table |
 
 Checked and unchanged: most important number first (441, largest, top-left, blue); contrast from the
-style guide table (text 14.8:1, muted 6.5:1, blue 5.2:1, vermillion marks 3.9:1); nothing relies on
+style guide table (text 14.8:1, muted 6.5:1, blue 4.8:1, orange marks 4.3:1); nothing relies on
 colour alone (series are labelled and values are printed); layout stacks to one column on a phone.
 
 ## Definitions (used identically in SQL, charts and takeaways)
