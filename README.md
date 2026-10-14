@@ -7,7 +7,7 @@ Workforce analytics pipeline, warehouse and dashboards for the fictional company
 - [x] Task 1: ETL pipeline (extract, transform, validate, publish, run log, tests, metric dictionary)
 - [x] Task 2: Analytics warehouse
 - [x] Task 3: Headcount & Departments dashboard
-- [ ] Task 4: Attendance analysis
+- [x] Task 4: Attendance analysis
 
 ## Quick start
 Requirements: Docker Desktop (tested with Docker 29.8 and Compose v5).
@@ -121,3 +121,23 @@ Loading twice changes nothing (0 inserted, 0 updated).
 - Charts: Headcount, Average tenure, Headcount trend, Joiners vs leavers, Headcount by department, by tenure band and by job level, plus key takeaways. Filters: Department and Date range.
 - Checks: `python -m pulseiq.check_reporting` (views vs pandas) and sql/q5_dashboard_numbers.sql (every dashboard number).
 - Export: dashboards/headcount_departments/ (no password stored). See dashboards/README.md to restore it.
+
+## Task 4: Attendance analysis
+
+Definitions: [docs/attendance_definitions.md](docs/attendance_definitions.md). Findings: [docs/attendance_note.md](docs/attendance_note.md) (one page).
+
+Run each from the project folder (the `--build` flag makes Docker use the latest code):
+
+| Command | What it does |
+|---|---|
+| `docker compose run --rm --build load python -m pulseiq.attendance` | Company monthly rates and checks A1 to A6 (`STATUS=ALL_MATCH`) |
+| `docker compose run --rm --build load python -m pulseiq.attendance_report` | Department summary, rolling 3 months, December check |
+| `docker compose run --rm --build load python -m pulseiq.leave_analysis` | Leave by status, type, start weekday and department |
+| `docker compose run --rm --build load python -m pulseiq.anomaly_review` | Checks the AI/ML anomaly flags against our attendance facts |
+
+Decisions:
+- Attendance rate = (present days + 0.5 x half days unpaid) / scheduled days, pooled (sum over sum). Paid leave counts as not present. Groups under 5 employees are blank.
+- 4 attendance rows dated after the employee left (DQ-01) are excluded; 1 employed month has no row and is not filled in.
+- Only Approved leave counts as leave taken. Leave running past September 2026 is cut off and pro-rated.
+- The anomaly flags are a review list only. They join on employee and month; 55 of 221 attendance flags are contradicted by our data. They feed no metric.
+- Finance & Accounts has the lowest rate because of two long maternity leaves, not poor attendance.
