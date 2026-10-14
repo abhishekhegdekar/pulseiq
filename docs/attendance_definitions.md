@@ -3,7 +3,7 @@
 Version 2. This replaces the first version, which wrongly said DQ-08 leave rows are corrected by swapping dates. Task 1 rejects them instead.
 
 ## 1. Source and grain
-- `fact_attendance`: one row per employee per month. There is no daily data, so every figure is monthly.
+- `fact_attendance_monthly`: one row per employee per month. There is no daily data, so every figure is monthly.
 - `scheduled_days` equals the working days in `dim_date` for that month (check A4).
 - Every row satisfies: present + paid leave + unpaid absence + half-day-unpaid = scheduled (check A1).
 

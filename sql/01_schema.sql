@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS fact_payroll (
 );
 
 -- Grain: one row per employee version per month (monthly attendance summary).
-CREATE TABLE IF NOT EXISTS fact_attendance (
+CREATE TABLE IF NOT EXISTS fact_attendance_monthly (
     employee_key        integer NOT NULL REFERENCES dim_employee,
     date_key            integer NOT NULL REFERENCES dim_date,
     attendance_fact_id  text NOT NULL,
@@ -179,8 +179,8 @@ CREATE INDEX IF NOT EXISTS ix_role_department      ON dim_role (department_id);
 CREATE INDEX IF NOT EXISTS ix_payroll_date         ON fact_payroll (date_key);
 CREATE INDEX IF NOT EXISTS ix_payroll_department   ON fact_payroll (department_id, date_key);
 CREATE INDEX IF NOT EXISTS ix_payroll_role         ON fact_payroll (role_id);
-CREATE INDEX IF NOT EXISTS ix_attendance_date      ON fact_attendance (date_key);
-CREATE INDEX IF NOT EXISTS ix_attendance_dept      ON fact_attendance (department_id, date_key);
+CREATE INDEX IF NOT EXISTS ix_attendance_date      ON fact_attendance_monthly (date_key);
+CREATE INDEX IF NOT EXISTS ix_attendance_dept      ON fact_attendance_monthly (department_id, date_key);
 CREATE INDEX IF NOT EXISTS ix_leave_employee       ON fact_leave (employee_key);
 CREATE INDEX IF NOT EXISTS ix_leave_start          ON fact_leave (start_date_key);
 CREATE INDEX IF NOT EXISTS ix_leave_type           ON fact_leave (leave_type_code);

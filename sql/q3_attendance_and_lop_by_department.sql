@@ -8,7 +8,7 @@ WITH att AS (
            sum(a.scheduled_days)         AS scheduled_days,
            sum(a.present_days)           AS present_days,
            sum(a.half_days_unpaid)       AS half_days_unpaid
-    FROM fact_attendance a
+    FROM fact_attendance_monthly a
     JOIN dim_date dt ON dt.date_key = a.date_key
     WHERE dt.year_month = '2026-09'
     GROUP BY a.department_id

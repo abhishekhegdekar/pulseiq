@@ -32,7 +32,7 @@ LOAD_ORDER = [
     ("role", "dim_role", ["role_id"]),
     ("employee", "dim_employee", ["employee_key"]),
     ("payroll", "fact_payroll", ["employee_key", "run_id"]),
-    ("attendance", "fact_attendance", ["employee_key", "date_key"]),
+    ("attendance", "fact_attendance_monthly", ["employee_key", "date_key"]),
     ("leave", "fact_leave", ["leave_request_id"]),
 ]
 

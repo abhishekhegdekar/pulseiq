@@ -185,7 +185,7 @@ Everything other teams need is in this repository. Nothing is sent anywhere else
 ## Assumptions
 
 - Work was committed straight to `main` in Phase 1, so there are no pull-request links. Later phases will use pull requests from branches.
-- The warehouse database is `pulseiq` (tables in the default schema, dashboard views in the `reporting` schema), not `pulseiq_wh` with schema `dw`. Table names follow our own design, for example `fact_attendance` where the reference sheet says `fact_attendance_monthly`.
+- The warehouse database is `pulseiq` (tables in the default schema, dashboard views in the `reporting` schema), not `pulseiq_wh` with schema `dw`. Table names follow our own design, for example `fact_attendance_monthly` where the reference sheet says `fact_attendance_monthly`.
 - The fixed "today" for tenure and ageing is set with `REPORTING_DATE=2026-09-30`, which does the job of `DEMO_TODAY`.
 - Superset's admin password and secret key come from `.env`, not from the guide's local defaults.
 - Dashboard colours are Superset's defaults, with vermillion for leavers. The guide's navy, blue and orange palette is not applied yet.

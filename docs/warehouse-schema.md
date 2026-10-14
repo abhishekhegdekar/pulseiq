@@ -8,7 +8,7 @@
 
 ## Grain of each fact
 - fact_payroll: one row per employee_key per payroll run (month).
-- fact_attendance: one row per employee_key per date_key.
+- fact_attendance_monthly: one row per employee_key per date_key.
 - fact_leave: one row per leave request.
 - fact_headcount_monthly: one row per employee_id per month-end (derived from dim_employee).
 

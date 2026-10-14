@@ -40,7 +40,7 @@ SELECT dt.date AS month_end_date,
        sum(a.paid_leave_days)::int        AS paid_leave_days,
        sum(a.unpaid_absence_days)::int    AS unpaid_absence_days,
        sum(a.late_arrivals)::int          AS late_arrivals
-FROM fact_attendance a
+FROM fact_attendance_monthly a
 JOIN dim_date dt       ON dt.date_key = a.date_key
 JOIN dim_department d  ON d.department_id = a.department_id
 LEFT JOIN ex           ON ex.employee_id = a.employee_id
@@ -52,7 +52,7 @@ HAVING count(DISTINCT a.employee_id) >= 5;
 -- Days of a leave that runs past the last attendance month are cut off and pro-rated by weekdays (Mon-Fri).
 CREATE OR REPLACE VIEW reporting.leave_by_type AS
 WITH win AS (
-    SELECT max(dt.date) AS window_end FROM fact_attendance a JOIN dim_date dt ON dt.date_key = a.date_key
+    SELECT max(dt.date) AS window_end FROM fact_attendance_monthly a JOIN dim_date dt ON dt.date_key = a.date_key
 ), cut AS (
     SELECT l.leave_request_id, l.employee_id, l.leave_type_code, l.status,
            CASE WHEN l.end_date <= w.window_end THEN l.days::numeric
@@ -100,7 +100,7 @@ SELECT f.period_end_date AS month_end_date,
             ELSE 'Not checkable' END AS monthly_data_check,
        count(*)::int AS flagged_employee_months
 FROM fact_anomaly_attendance f
-JOIN fact_attendance a ON a.employee_id = f.employee_id
+JOIN fact_attendance_monthly a ON a.employee_id = f.employee_id
 JOIN dim_date dt       ON dt.date_key = a.date_key AND dt.date = f.period_end_date
 JOIN dim_department d  ON d.department_id = a.department_id
 WHERE f.flagged = 'Y'

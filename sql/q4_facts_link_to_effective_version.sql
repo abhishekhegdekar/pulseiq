@@ -10,7 +10,7 @@ WITH rows_ AS (
     JOIN dim_employee fe ON fe.employee_key = f.employee_key
     UNION ALL
     SELECT 'attendance', a.employee_key, dt.date, fe.employee_id, a.department_id, NULL
-    FROM fact_attendance a
+    FROM fact_attendance_monthly a
     JOIN dim_date dt ON dt.date_key = a.date_key
     JOIN dim_employee fe ON fe.employee_key = a.employee_key
 ), effective AS (

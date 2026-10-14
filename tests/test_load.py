@@ -27,7 +27,7 @@ def test_rows_from_frame_follows_the_requested_column_order():
 def test_parents_load_before_children():
     order = [table for _, table, _ in LOAD_ORDER]
     for parent, child in [("dim_department", "dim_role"), ("dim_role", "dim_employee"),
-                          ("dim_employee", "fact_payroll"), ("dim_date", "fact_attendance"),
+                          ("dim_employee", "fact_payroll"), ("dim_date", "fact_attendance_monthly"),
                           ("dim_leave_type", "fact_leave"), ("dim_employee", "fact_leave")]:
         assert order.index(parent) < order.index(child)
 
