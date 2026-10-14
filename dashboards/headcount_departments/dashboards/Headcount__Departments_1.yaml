@@ -1,0 +1,341 @@
+dashboard_title: Headcount & Departments
+description: null
+css: ''
+slug: null
+certified_by: ''
+certification_details: ''
+published: true
+uuid: 738536c2-e1a6-45af-ac6a-d1a06aebf6a9
+position:
+  CHART-explore-1-1:
+    children: []
+    id: CHART-explore-1-1
+    meta:
+      chartId: 1
+      height: 23
+      sliceName: Headcount
+      uuid: 2f98d1af-62b0-4ee5-98a5-833660ae09e3
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-OBZD9v1JuPMxtDB7hyzs5
+    type: CHART
+  CHART-explore-2-1:
+    children: []
+    id: CHART-explore-2-1
+    meta:
+      chartId: 2
+      height: 23
+      sliceName: Average tenure (years)
+      uuid: 4aa18bdc-9d5e-41ff-b7ed-f27cbbdf5a3c
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-OBZD9v1JuPMxtDB7hyzs5
+    type: CHART
+  CHART-explore-3-1:
+    children: []
+    id: CHART-explore-3-1
+    meta:
+      chartId: 3
+      height: 50
+      sliceName: Headcount by department
+      uuid: 95d12258-014a-4af2-8c9b-059491fc57df
+      width: 4
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-S0KoFR9YSF0TQK2K8RxAe
+    type: CHART
+  CHART-explore-4-1:
+    children: []
+    id: CHART-explore-4-1
+    meta:
+      chartId: 4
+      height: 52
+      sliceName: Headcount by tenure band
+      uuid: c6a495dc-5285-445c-9eb8-d781949a69d4
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-tFamzFCPIL09098Uv1G38
+    type: CHART
+  CHART-explore-5-1:
+    children: []
+    id: CHART-explore-5-1
+    meta:
+      chartId: 5
+      height: 52
+      sliceName: Headcount by job level
+      uuid: 0bc24e67-4cf5-4760-901e-9daf08edec36
+      width: 6
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-tFamzFCPIL09098Uv1G38
+    type: CHART
+  CHART-explore-6-1:
+    children: []
+    id: CHART-explore-6-1
+    meta:
+      chartId: 6
+      height: 50
+      sliceName: Headcount trend
+      uuid: ce640f43-ec28-49fd-ad16-12dd8873fd8d
+      width: 4
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-S0KoFR9YSF0TQK2K8RxAe
+    type: CHART
+  CHART-explore-7-1:
+    children: []
+    id: CHART-explore-7-1
+    meta:
+      chartId: 7
+      height: 50
+      sliceName: Joiners vs leavers
+      uuid: ca0786cd-e008-45c2-94aa-12f9f4a7c2e4
+      width: 4
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-S0KoFR9YSF0TQK2K8RxAe
+    type: CHART
+  DASHBOARD_VERSION_KEY: v2
+  GRID_ID:
+    children:
+    - ROW-xut_FppFvPj_uCSuHMYcX
+    - ROW-OBZD9v1JuPMxtDB7hyzs5
+    - ROW-S0KoFR9YSF0TQK2K8RxAe
+    - ROW-tFamzFCPIL09098Uv1G38
+    id: GRID_ID
+    parents:
+    - ROOT_ID
+    type: GRID
+  HEADER_ID:
+    id: HEADER_ID
+    meta:
+      text: Headcount & Departments
+    type: HEADER
+  MARKDOWN-yDtLw5QQYXMpOhfh9oN6A:
+    children: []
+    id: MARKDOWN-yDtLw5QQYXMpOhfh9oN6A
+    meta:
+      code: 'Key takeaways (all departments; text does not change with filters)
+
+
+        - Headcount grew from 393 to 441 in 12 months (+12%).
+
+        - Engineering holds 167 of 441 people (38%); Executive Office has 1.
+
+        - 99 of 441 people (22%) have under 1 year of tenure; 32 have 10 or more.
+
+        - Levels 2 and 3 make up 262 of 441 people (59%).
+
+        - 17 joined and 3 left in Sep 2026; joiners outnumbered leavers in 9 of the
+        last 12 months.'
+      height: 25
+      width: 12
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-xut_FppFvPj_uCSuHMYcX
+    type: MARKDOWN
+  ROOT_ID:
+    children:
+    - GRID_ID
+    id: ROOT_ID
+    type: ROOT
+  ROW-OBZD9v1JuPMxtDB7hyzs5:
+    children:
+    - CHART-explore-1-1
+    - CHART-explore-2-1
+    id: ROW-OBZD9v1JuPMxtDB7hyzs5
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+  ROW-S0KoFR9YSF0TQK2K8RxAe:
+    children:
+    - CHART-explore-6-1
+    - CHART-explore-7-1
+    - CHART-explore-3-1
+    id: ROW-S0KoFR9YSF0TQK2K8RxAe
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+  ROW-tFamzFCPIL09098Uv1G38:
+    children:
+    - CHART-explore-4-1
+    - CHART-explore-5-1
+    id: ROW-tFamzFCPIL09098Uv1G38
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+  ROW-xut_FppFvPj_uCSuHMYcX:
+    children:
+    - MARKDOWN-yDtLw5QQYXMpOhfh9oN6A
+    id: ROW-xut_FppFvPj_uCSuHMYcX
+    meta:
+      background: BACKGROUND_WHITE
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    type: ROW
+metadata:
+  color_scheme_domain: []
+  shared_label_colors:
+  - count
+  map_label_colors:
+    count: '#1FA8C9'
+    Joiners: '#1FA8C9'
+    Leavers: '#454E7C'
+  label_colors: {}
+  chart_configuration:
+    '3':
+      id: 3
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 1
+        - 2
+        - 4
+        - 5
+        - 6
+        - 7
+    '4':
+      id: 4
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 1
+        - 2
+        - 3
+        - 5
+        - 6
+        - 7
+    '5':
+      id: 5
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 6
+        - 7
+    '6':
+      id: 6
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 7
+    '7':
+      id: 7
+      crossFilters:
+        scope: global
+        chartsInScope:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+  global_chart_configuration:
+    scope:
+      rootPath:
+      - ROOT_ID
+      excluded: []
+    chartsInScope:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+  native_filter_configuration:
+  - cascadeParentIds: []
+    controlValues:
+      creatable: true
+      defaultToFirstItem: false
+      enableEmptyFilter: false
+      inverseSelection: false
+      multiSelect: true
+      searchAllOptions: false
+    defaultDataMask:
+      extraFormData: {}
+      filterState: {}
+      ownState: {}
+    description: ''
+    filterType: filter_select
+    id: NATIVE_FILTER-WiL0EKKOoFrVBis97gF9X
+    name: Department
+    scope:
+      excluded: []
+      rootPath:
+      - ROOT_ID
+    sortMetric: null
+    targets:
+    - column:
+        name: department_name
+      datasetUuid: e852e26f-e2eb-4c3a-93f9-065cb3903cb4
+    type: NATIVE_FILTER
+    chartsInScope:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    tabsInScope: []
+  - controlValues:
+      enableEmptyFilter: false
+    defaultValueQueriesData: null
+    description: ''
+    filterType: filter_time
+    id: NATIVE_FILTER-Os8SRArSPWmd5ZMcmPF_-
+    name: Date range
+    requiredFirst: {}
+    scope:
+      excluded:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      rootPath:
+      - ROOT_ID
+    type: NATIVE_FILTER
+    chartsInScope:
+    - 6
+    - 7
+    tabsInScope: []
+  chart_customization_config: []
+  color_scheme: ''
+  refresh_frequency: 0
+  expanded_slices: {}
+  timed_refresh_immune_slices: []
+  cross_filters_enabled: true
+  default_filters: '{}'
+theme_uuid: null
+version: 1.0.0
